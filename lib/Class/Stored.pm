@@ -37,7 +37,12 @@ sub _make_accessor($$) {
         }
 
         if (@_) {
-            $slot->{modified}{$name} = $_[0] if _is_different $value, $_[0];
+            if (! defined $slot->{origin}
+                || _is_different $slot->{origin}{$name}, $_[0]) {
+                $slot->{modified}{$name} = $_[0];
+            } else {
+                delete $slot->{modified}{$name};
+            }
         }
 
         return $value;

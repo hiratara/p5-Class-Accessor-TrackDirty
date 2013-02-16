@@ -41,13 +41,25 @@ use t::TestEntity;
     ok ! $entity->is_modified, "You can't modify is_modified.";
 
     $entity->key1(35);
+    $entity->key2(undef);
+    ok ! $entity->is_modified, "I didn't change anything :p";
     ok ! $entity->is_modified, "I didn't change anything :p";
 
     $entity->key1(36);
+    $entity->key2("something");
+    ok $entity->is_modified, "Changed";
     ok $entity->is_modified, "Changed";
 
+    $entity->key1(35);
+    $entity->key2(undef);
+    ok ! $entity->is_modified, "Finally return to the original value :p";
+    ok ! $entity->is_modified, "Finally return to the original value :p";
+
+    $entity->key1(36);
+    $entity->key2("something");
     $entity->revert;
     is $entity->key1, 35, "reverted changes";
+    is $entity->key2, undef, "reverted changes";
     ok ! $entity->is_modified, "reverted all statuses";
 
     # Freeze all changes
