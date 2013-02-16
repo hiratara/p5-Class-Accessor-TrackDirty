@@ -3,7 +3,7 @@ Class-Stored-*
 !.git*
 !.shipit
 !.dimconfig
-!.travis.yaml
+!.travis.yml
 inc/
 *.o
 *.obj
