@@ -1,5 +1,5 @@
 ---
-abstract: 'Perl extention to do something'
+abstract: 'Define simple entities stored in some places.'
 author:
   - 'Masahiro Honma E<lt>hiratara@cpan.orgE<gt>'
 build_requires:
@@ -17,6 +17,10 @@ name: Class-Stored
 no_index:
   directory:
     - inc
+provides:
+  Class::Stored:
+    file: lib/Class/Stored.pm
+    version: 0.01
 requires:
   perl: 5.008001
 resources:

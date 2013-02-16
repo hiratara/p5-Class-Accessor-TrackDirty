@@ -1,5 +1,5 @@
 {
-   "abstract" : "Perl extention to do something",
+   "abstract" : "Define simple entities stored in some places.",
    "author" : [
       "Masahiro Honma E<lt>hiratara@cpan.orgE<gt>"
    ],
@@ -34,6 +34,12 @@
          "requires" : {
             "perl" : "5.008001"
          }
+      }
+   },
+   "provides" : {
+      "Class::Stored" : {
+         "file" : "lib/Class/Stored.pm",
+         "version" : "0.01"
       }
    },
    "release_status" : "stable",

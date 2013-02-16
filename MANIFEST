@@ -1,5 +1,6 @@
 .dimconfig
 .shipit
+.travis.yaml
 Build.PL
 Changes
 lib/Class/Stored.pm
@@ -10,6 +11,9 @@ META.yml
 README
 t/000_load.t
 t/001_basic.t
+t/accessor.t
+t/modified.t
+t/TestEntity.pm
 xt/perlcritic.t
 xt/pod.t
 xt/podcoverage.t
