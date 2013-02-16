@@ -4,7 +4,7 @@ use strict;
 use warnings;
 our $VERSION = '0.01';
 
-our $RESERVED_FIELD = '__' . __PACKAGE__;
+our $RESERVED_FIELD = '_modified';
 our $NEW = 'new';
 our $FROM_HASH = 'from_hash';
 our $TO_HASH = 'to_hash';
@@ -45,16 +45,16 @@ sub _make_accessor($$) {
 
     *{"$package\::$name"} = sub {
         my $self = shift;
-        my $slot = ($self->{$RESERVED_FIELD} //= {});
         my $value;
         if (exists $self->{$name}) {
             $value = $self->{$name};
-        } elsif (defined $slot->{origin})  {
-            $value = $slot->{origin}{$name};
+        } elsif (defined $self->{$RESERVED_FIELD})  {
+            $value = $self->{$RESERVED_FIELD}{$name};
         }
 
         if (@_) {
-            if (! defined $slot->{origin} || _is_different $slot->{origin}{$name}, $_[0]) {
+            if (! defined $self->{$RESERVED_FIELD}
+                || _is_different $self->{$RESERVED_FIELD}{$name}, $_[0]) {
                 $self->{$name} = $_[0];
             } else {
                 delete $self->{$name};
@@ -84,9 +84,7 @@ sub _mk_helpers($) {
         my %origin = ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
         $clean_fields->(\%origin);
 
-        bless { 
-            $RESERVED_FIELD => { origin => \%origin },
-        }, $package;
+        bless {$RESERVED_FIELD => \%origin}, $package;
     };
 
     *{"$package\::$TO_HASH"} = sub {
@@ -109,8 +107,7 @@ sub _mk_helpers($) {
 
     *{"$package\::$IS_MODIFIED"} = sub {
         my $self = shift;
-        my $slot = $self->{$RESERVED_FIELD};
-        return 1 unless defined $slot->{origin};
+        return 1 unless defined $self->{$RESERVED_FIELD};
 
         for (@$fields) {
             return 1 if exists $self->{$_};
