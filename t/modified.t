@@ -10,6 +10,10 @@ for (qw(TestEntity CasualEntity)) {
         ok $entity->is_modified, "The new entity should be stored";
         $entity->is_modified(undef);
         ok $entity->is_modified, "You can't modify is_modified.";
+
+        $entity->revert;
+        is $entity->key1, undef, "All fields shoud be removed.";
+        ok $entity->is_modified, "The new entity should be stored";
     }
 
     {

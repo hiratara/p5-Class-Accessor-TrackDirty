@@ -31,17 +31,17 @@ sub _make_accessor($$) {
         my $self = shift;
         my $slot = ($self->{$RESERVED_FIELD} //= {});
         my $value;
-        if (exists $slot->{modified}{$name}) {
-            $value = $slot->{modified}{$name};
-        } else {
+        if (exists $self->{$name}) {
             $value = $self->{$name};
+        } elsif (defined $slot->{origin})  {
+            $value = $slot->{origin}{$name};
         }
 
         if (@_) {
-            if (! $slot->{is_old} || _is_different $self->{$name}, $_[0]) {
-                $slot->{modified}{$name} = $_[0];
+            if (! defined $slot->{origin} || _is_different $slot->{origin}{$name}, $_[0]) {
+                $self->{$name} = $_[0];
             } else {
-                delete $slot->{modified}{$name};
+                delete $self->{$name};
             }
         }
 
@@ -80,12 +80,7 @@ sub import {
             my %modified = ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
             $_clean_fields->(\%modified);
 
-            bless {
-                $RESERVED_FIELD => {
-                    modified => \%modified,
-                    is_old   => 0,
-                },
-            }, $package;
+            bless \%modified => $package;
         };
     };
 
@@ -95,8 +90,7 @@ sub import {
         $_clean_fields->(\%origin);
 
         bless { 
-            %origin,
-            $RESERVED_FIELD => { modified => {}, is_old => 1 },
+            $RESERVED_FIELD => { origin => \%origin },
         }, $package;
     };
 
@@ -122,17 +116,17 @@ sub import {
     *{"$package\::$IS_MODIFIED"} = sub {
         my $self = shift;
         my $slot = $self->{$RESERVED_FIELD};
-        return 1 unless $slot->{is_old};
+        return 1 unless defined $slot->{origin};
 
         for (@fields) {
-            return 1 if exists $slot->{modified}{$_};
+            return 1 if exists $self->{$_};
         }
         return;
     };
 
     *{"$package\::$REVERT"} = sub {
         my $self = shift;
-        $self->{$RESERVED_FIELD}{modified} = {};
+        %$self = ($RESERVED_FIELD => $self->{$RESERVED_FIELD});
     };
 }
 
