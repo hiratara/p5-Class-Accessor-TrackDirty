@@ -1,10 +1,11 @@
 use strict;
 use warnings;
 use Test::More;
+use t::SimpleEntity;
 use t::TestEntity;
 use t::CasualEntity;
 
-for (qw(TestEntity CasualEntity)) {
+for (qw(SimpleEntity TestEntity CasualEntity)) {
     {
         my $entity = "t::$_"->new({key1 => 35});
         ok $entity->is_modified, "The new entity should be stored";

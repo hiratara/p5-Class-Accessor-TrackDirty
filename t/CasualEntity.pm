@@ -3,8 +3,8 @@ use strict;
 use warnings;
 use Class::Stored;
 
-fields qw(key1 key2);
-volatile_fields qw(mtime);
+Class::Stored->mk_accessors(qw(key1 key2));
+Class::Stored->mk_volatile_accessors(qw(mtime));
 
 sub new {
     my $class = shift;

@@ -5,14 +5,17 @@ use warnings;
 our $VERSION = '0.01';
 
 our $RESERVED_FIELD = '__' . __PACKAGE__;
-our $FIELDS = 'fields';
-our $VOLATILE_FIELDS = 'volatile_fields';
-our $MAKE_NEW = 'mk_new';
 our $NEW = 'new';
 our $FROM_HASH = 'from_hash';
 our $TO_HASH = 'to_hash';
 our $IS_MODIFIED = 'is_modified';
 our $REVERT = 'revert';
+
+my %package_info;
+sub _package_info($) {
+    my $package = shift;
+    $package_info{$package} //= {fields => [], volatiles => []};
+}
 
 sub _is_different($$) {
     my ($x, $y) = @_;
@@ -22,6 +25,19 @@ sub _is_different($$) {
         return defined $x || defined $y;
     }
 }
+
+sub _fields_cleaner($) {
+    my $package = shift;
+    my ($fields, $volatile_fields) =
+        @{_package_info $package}{qw(fields volatiles)};
+    sub {
+        my $hash_ref = shift;
+        for my $k (keys %$hash_ref) {
+            delete $hash_ref->{$k} unless grep { $k eq $_ }
+                                               @$fields, @$volatile_fields;
+        }
+    };
+};
 
 sub _make_accessor($$) {
     no strict 'refs';
@@ -49,45 +65,24 @@ sub _make_accessor($$) {
     };
 }
 
-sub import {
+sub _mk_accessors($@) {
+    my $package = shift;
+    _make_accessor $package => $_ for @_;
+    push @{_package_info($package)->{fields}}, @_;
+}
+
+sub _mk_helpers($) {
     no strict 'refs';
-    my $class = shift;
-    my $package = caller 0;
+    my $package = shift;
+    my ($fields, $volatile_fields) =
+        @{_package_info $package}{qw(fields volatiles)};
+    my $clean_fields = _fields_cleaner($package);
 
-    my (@fields, @volatile_fields);
-
-    my $_clean_fields = sub {
-        my $hash_ref = shift;
-        for my $k (keys %$hash_ref) {
-            delete $hash_ref->{$k} unless grep { $k eq $_ }
-                                               @fields, @volatile_fields;
-        }
-    };
-
-    *{"$package\::$FIELDS"} = sub {
-        _make_accessor $package => $_ for @_;
-        push @fields, @_;
-    };
-
-    *{"$package\::$VOLATILE_FIELDS"} = sub {
-        _make_accessor $package => $_ for @_;
-        push @volatile_fields, @_;
-    };
-
-    *{"$package\::$MAKE_NEW"} = sub {
-        *{"$package\::$NEW"} = sub {
-            my $package = shift;
-            my %modified = ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
-            $_clean_fields->(\%modified);
-
-            bless \%modified => $package;
-        };
-    };
-
+    # cleate helper methods
     *{"$package\::$FROM_HASH"} = sub {
         my $package = shift;
         my %origin = ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
-        $_clean_fields->(\%origin);
+        $clean_fields->(\%origin);
 
         bless { 
             $RESERVED_FIELD => { origin => \%origin },
@@ -102,7 +97,7 @@ sub import {
                 # Don't store undefined values.
                 my $v = $self->$_;
                 defined $v ? ($_ => $v) : ();
-            } @fields),
+            } @$fields),
             lastupdate => time, v => 2,
         );
 
@@ -112,13 +107,12 @@ sub import {
         return \%hash;
     };
 
-
     *{"$package\::$IS_MODIFIED"} = sub {
         my $self = shift;
         my $slot = $self->{$RESERVED_FIELD};
         return 1 unless defined $slot->{origin};
 
-        for (@fields) {
+        for (@$fields) {
             return 1 if exists $self->{$_};
         }
         return;
@@ -128,6 +122,52 @@ sub import {
         my $self = shift;
         %$self = ($RESERVED_FIELD => $self->{$RESERVED_FIELD});
     };
+}
+
+sub _mk_volatile_accessors($@) {
+    my $package = shift;
+    _make_accessor $package => $_ for @_;
+    push @{_package_info($package)->{volatiles}}, @_;
+}
+
+sub _mk_new($) {
+    no strict 'refs';
+    my $package = shift;
+
+    my $clean_fields = _fields_cleaner($package);
+    *{"$package\::$NEW"} = sub {
+        my $package = shift;
+        my %modified = ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
+        $clean_fields->(\%modified);
+
+        bless \%modified => $package;
+    };
+}
+
+sub mk_accessors {
+    (undef, my @fields) = @_;
+    my $package = caller(0);
+    _mk_accessors $package => @fields;
+    _mk_helpers $package;
+}
+
+sub mk_volatile_accessors {
+    (undef, my @volatiles) = @_;
+    my $package = caller(0);
+    _mk_volatile_accessors $package => @volatiles;
+}
+
+sub mk_new {
+    my $package = caller(0);
+    _mk_new $package;
+}
+
+sub mk_new_and_accessors {
+    (undef, my @fields) = @_;
+    my $package = caller(0);
+    _mk_accessors $package => @fields;
+    _mk_helpers $package;
+    _mk_new $package;
 }
 
 1;
@@ -141,8 +181,8 @@ Class::Stored - Define simple entities stored in some places.
 
     package UserInfo;
     use Class::Stored;
-    fields "name", "password";
-    volatile_fields "modified";
+    Class::Stored->mk_new_and_accessors("name", "password");
+    Class::Stored->mk_volatile_accessors("modified");
 
     package main;
     my $user = UserInfo->new({name => 'honma', password => 'F!aS3l'});
@@ -167,9 +207,13 @@ Class::Stored defines simple entities stored in files, RDBMS, KVS, and so on.
 
 =head2 Functions
 
-=head3 C<< fields("name1", "name2", ...); >>
+=head3 C<< Class::Stored->mk_accessors("name1", "name2", ...); >>
 
-=head3 C<< volatile_fields("name1", "name2", ...); >>
+=head3 C<< Class::Stored->mk_volatile_accessors("name1", "name2", ...); >>
+
+=head3 C<< Class::Stored->mk_new; >>
+
+=head3 C<< Class::Stored->mk_new_and_accessors("name1", "name2", ...); >>
 
 =head3 C<< my $object = YourClass->new({name1 => "value1", ...}); >>
 
