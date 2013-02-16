@@ -7,6 +7,7 @@ our $VERSION = '0.01';
 our $RESERVED_FIELD = '__' . __PACKAGE__;
 our $FIELDS = 'fields';
 our $VOLATILE_FIELDS = 'volatile_fields';
+our $MAKE_NEW = 'mk_new';
 our $NEW = 'new';
 our $FROM_HASH = 'from_hash';
 our $TO_HASH = 'to_hash';
@@ -28,17 +29,16 @@ sub _make_accessor($$) {
 
     *{"$package\::$name"} = sub {
         my $self = shift;
-        my $slot = $self->{$RESERVED_FIELD};
+        my $slot = ($self->{$RESERVED_FIELD} //= {});
         my $value;
         if (exists $slot->{modified}{$name}) {
             $value = $slot->{modified}{$name};
-        } elsif (defined $slot->{origin}) {
-            $value = $slot->{origin}{$name};
+        } else {
+            $value = $self->{$name};
         }
 
         if (@_) {
-            if (! defined $slot->{origin}
-                || _is_different $slot->{origin}{$name}, $_[0]) {
+            if (! $slot->{is_old} || _is_different $self->{$name}, $_[0]) {
                 $slot->{modified}{$name} = $_[0];
             } else {
                 delete $slot->{modified}{$name};
@@ -74,15 +74,19 @@ sub import {
         push @volatile_fields, @_;
     };
 
-    *{"$package\::$NEW"} = sub {
-        my $package = shift;
-        my %modified = ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
-        $_clean_fields->(\%modified);
+    *{"$package\::$MAKE_NEW"} = sub {
+        *{"$package\::$NEW"} = sub {
+            my $package = shift;
+            my %modified = ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
+            $_clean_fields->(\%modified);
 
-        bless { $RESERVED_FIELD => {
-            modified => \%modified,
-            origin   => undef, # Have no data
-        } }, $package;
+            bless {
+                $RESERVED_FIELD => {
+                    modified => \%modified,
+                    is_old   => 0,
+                },
+            }, $package;
+        };
     };
 
     *{"$package\::$FROM_HASH"} = sub {
@@ -90,10 +94,10 @@ sub import {
         my %origin = ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
         $_clean_fields->(\%origin);
 
-        bless { $RESERVED_FIELD => {
-            modified => {},
-            origin   => \%origin,
-        } }, $package;
+        bless { 
+            %origin,
+            $RESERVED_FIELD => { modified => {}, is_old => 1 },
+        }, $package;
     };
 
     *{"$package\::$TO_HASH"} = sub {
@@ -118,7 +122,7 @@ sub import {
     *{"$package\::$IS_MODIFIED"} = sub {
         my $self = shift;
         my $slot = $self->{$RESERVED_FIELD};
-        return 1 unless defined $slot->{origin};
+        return 1 unless $slot->{is_old};
 
         for (@fields) {
             return 1 if exists $slot->{modified}{$_};
