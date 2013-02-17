@@ -36,12 +36,6 @@
          }
       }
    },
-   "provides" : {
-      "Class::Accessor::TrackDirty" : {
-         "file" : "lib/Class/Accessor/TrackDirty.pm",
-         "version" : "0.01"
-      }
-   },
    "release_status" : "stable",
    "resources" : {
       "license" : [

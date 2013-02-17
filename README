@@ -1,15 +1,16 @@
 NAME
-    Class::Accessor::TrackDirty - Define simple entities stored in some places.
+    Class::Accessor::TrackDirty - Define simple entities stored in some
+    places.
 
 SYNOPSIS
         package UserInfo;
         use Class::Accessor::TrackDirty;
-        fields "name", "password";
-        volatile_fields "modified";
+        Class::Accessor::TrackDirty->mk_new_and_accessors("name", "password");
+        Class::Accessor::TrackDirty->mk_volatile_accessors("modified");
 
         package main;
         my $user = UserInfo->new({name => 'honma', password => 'F!aS3l'});
-        store_into_someplace($user->to_hash) if $user->is_modified;
+        store_into_someplace($user->to_hash) if $user->is_dirty;
         ...
         $user = UserInfo->from_hash(restore_from_someplace());
         $user->name('hiratara');
@@ -20,22 +21,56 @@ SYNOPSIS
         ... blabla ...
 
         # Store it only if $user was really modified.
-        store_into_someplace($user->to_hash) if $user->is_modified;
+        store_into_someplace($user->to_hash) if $user->is_dirty;
 
 DESCRIPTION
-    Class::Accessor::TrackDirty defines simple entities stored in files, RDBMS, KVS, and
-    so on.
+    Class::Accessor::TrackDirty defines simple entities stored in files,
+    RDBMS, KVS, and so on. It tracks dirty columns and you can store it only
+    when the instance was really modified.
 
 INTERFACE
   Functions
-   "fields("name1", "name2", ...);"
-   "volatile_fields("name1", "name2", ...);"
-   "my $object = YourClass->new({name1 => "value1", ...});"
-   "my $object = YourClass->from_hash({name1 => "value1", ...});"
-   "my $hash_ref = $your_object->to_hash;"
-   "my $hash_ref = $your_object->revert;"
+   "Class::Accessor::TrackDirty->mk_new;"
+    Create the "<new"> methods in your class. You can pass a hash-ref or
+    hash-like list to "<new"> method.
+
+    "my $object = YourClass->new({name1 => "value1", ...});"
+        The instance created by "<new"> is regarded as `dirty' since it
+        hasn't been stored yet.
+
+   "Class::Accessor::TrackDirty->mk_accessors("name1", "name2", ...);"
+    Create accessor methods and helper methods in your class. Following
+    helper methods will be created automatically.
+
+    "$your_object->is_dirty;"
+        Chack that the instance is modified. If it's true, you should store
+        this instance into some place through using "<to_hash"> method.
+
+    "my $hash_ref = $your_object->to_hash;"
+        Eject data from this instance as plain hash-ref format.
+        "<$your_object"> is regarded as `clean' after calling this method.
+
+        You'd better store "<$hash_ref"> into some place ASAP. It's up to
+        you how "<$hash_ref"> should be serialized.
+
+    "my $object = YourClass->from_hash({name1 => "value1", ...});"
+        Rebuild the instance from a hash-ref ejected by "<to_hash"> method.
+        The instance constructed by "<from_hash"> is regarded as `clean'.
+
+    "$your_object->revert;"
+        Revert all `dirty' changes. "<$your_object"> retruns to the point
+        where you call "<new">, "<to_hash">, or "<from_hash">.
+
+   "Class::Accessor::TrackDirty->mk_volatile_accessors("name1", "name2", ...);"
+    Define the field which isn't tracked. You can freely change these
+    fields, and it will never be marked as `dirty'.
+
+   "Class::Accessor::TrackDirty->mk_new_and_accessors("name1", "name2", ...);"
+    This method is a combination of "<mk_accessors"> and "<mk_new">.
+
 SEE ALSO
-    perl
+    Class::Accessor, Class::Accessor::Lite, MooseX::TrackDirty::Attributes,
+    Hash::Dirty
 
 AUTHOR
     Masahiro Honma <hiratara@cpan.org>

@@ -1,6 +1,6 @@
 .dimconfig
 .shipit
-.travis.yaml
+.travis.yml
 Build.PL
 Changes
 lib/Class/Accessor/TrackDirty.pm
@@ -12,7 +12,10 @@ README
 t/000_load.t
 t/001_basic.t
 t/accessor.t
+t/CasualEntity.pm
 t/modified.t
+t/own_constructor.t
+t/SimpleEntity.pm
 t/TestEntity.pm
 xt/perlcritic.t
 xt/pod.t
