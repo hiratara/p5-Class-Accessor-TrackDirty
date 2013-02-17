@@ -8,66 +8,66 @@ use t::CasualEntity;
 for (qw(SimpleEntity TestEntity CasualEntity)) {
     {
         my $entity = "t::$_"->new({key1 => 35});
-        ok $entity->is_modified, "The new entity should be stored";
-        $entity->is_modified(undef);
-        ok $entity->is_modified, "You can't modify is_modified.";
+        ok $entity->is_dirty, "The new entity should be stored";
+        $entity->is_dirty(undef);
+        ok $entity->is_dirty, "You can't modify is_dirty.";
 
         $entity->revert;
         is $entity->key1, undef, "All fields shoud be removed.";
-        ok $entity->is_modified, "The new entity should be stored";
+        ok $entity->is_dirty, "The new entity should be stored";
     }
 
     {
         my $entity = "t::$_"->new({});
-        ok $entity->is_modified, "Save empty data";
+        ok $entity->is_dirty, "Save empty data";
 
         $entity->revert;
-        ok $entity->is_modified, "Is reverted but it has not been serialized.";
+        ok $entity->is_dirty, "Is reverted but it has not been serialized.";
 
         $entity->key1(18);
         is $entity->key1, 18, "Ordinary use after reverting.";
-        ok $entity->is_modified, "The key1 field was modified.";
+        ok $entity->is_dirty, "The key1 field was modified.";
     }
 
     {
         my $entity = "t::$_"->new({
-            is_modified => 1,
+            is_dirty => 1,
         });
         $entity->key1(99);  # Keep _origin field from being defined.
 
         $entity->revert;
-        ok $entity->is_modified, "Is reverted but it has not been serialized.";
+        ok $entity->is_dirty, "Is reverted but it has not been serialized.";
     }
 
     {
         my $entity = "t::$_"->from_hash({
             key1 => 35,
         });
-        ok ! $entity->is_modified, "need not store the loaded data";
-        $entity->is_modified(1);
-        ok ! $entity->is_modified, "You can't modify is_modified.";
+        ok ! $entity->is_dirty, "need not store the loaded data";
+        $entity->is_dirty(1);
+        ok ! $entity->is_dirty, "You can't modify is_dirty.";
 
         $entity->key1(35);
         $entity->key2(undef);
-        ok ! $entity->is_modified, "I didn't change anything :p";
-        ok ! $entity->is_modified, "I didn't change anything :p";
+        ok ! $entity->is_dirty, "I didn't change anything :p";
+        ok ! $entity->is_dirty, "I didn't change anything :p";
 
         $entity->key1(36);
         $entity->key2("something");
-        ok $entity->is_modified, "Changed";
-        ok $entity->is_modified, "Changed";
+        ok $entity->is_dirty, "Changed";
+        ok $entity->is_dirty, "Changed";
 
         $entity->key1(35);
         $entity->key2(undef);
-        ok ! $entity->is_modified, "Finally return to the original value :p";
-        ok ! $entity->is_modified, "Finally return to the original value :p";
+        ok ! $entity->is_dirty, "Finally return to the original value :p";
+        ok ! $entity->is_dirty, "Finally return to the original value :p";
 
         $entity->key1(36);
         $entity->key2("something");
         $entity->revert;
         is $entity->key1, 35, "reverted changes";
         is $entity->key2, undef, "reverted changes";
-        ok ! $entity->is_modified, "reverted all statuses";
+        ok ! $entity->is_dirty, "reverted all statuses";
 
         # Freeze all changes
         $entity->key1(36);
@@ -75,7 +75,7 @@ for (qw(SimpleEntity TestEntity CasualEntity)) {
         my $hash = $entity->to_hash;
         is $hash->{key1}, 36;
         is $entity->key1, 36;
-        ok ! $entity->is_modified, "Reset the is_modified field";
+        ok ! $entity->is_dirty, "Reset the is_dirty field";
     }
 
     {
@@ -89,19 +89,19 @@ for (qw(SimpleEntity TestEntity CasualEntity)) {
         $entity->mtime(1360918002);
 
         is $entity->mtime, 1360918002;
-        ok ! $entity->is_modified, "Don't save the modification of modified";
+        ok ! $entity->is_dirty, "Don't save the modification of modified";
 
         $entity->key1(36);
-        my $hash = $entity->is_modified ? $entity->to_hash : {};
+        my $hash = $entity->is_dirty ? $entity->to_hash : {};
         is $hash->{key1}, 36;
         ok ! exists $hash->{mtime}, "Don't store volatile fields";
     }
 
     {
         my $entity = "t::$_"->from_hash({
-            is_modified => 1,
+            is_dirty => 1,
         });
-        ok ! $entity->is_modified, "You mustn't set is_modified.";
+        ok ! $entity->is_dirty, "You mustn't set is_dirty.";
     }
 }
 

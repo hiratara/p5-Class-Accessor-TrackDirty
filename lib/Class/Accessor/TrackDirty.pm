@@ -8,7 +8,7 @@ our $RESERVED_FIELD = '_original';
 our $NEW = 'new';
 our $FROM_HASH = 'from_hash';
 our $TO_HASH = 'to_hash';
-our $IS_MODIFIED = 'is_modified';
+our $IS_MODIFIED = 'is_dirty';
 our $REVERT = 'revert';
 
 my %package_info;
@@ -183,7 +183,7 @@ Class::Accessor::TrackDirty - Define simple entities stored in some places.
 
     package main;
     my $user = UserInfo->new({name => 'honma', password => 'F!aS3l'});
-    store_into_someplace($user->to_hash) if $user->is_modified;
+    store_into_someplace($user->to_hash) if $user->is_dirty;
     ...
     $user = UserInfo->from_hash(restore_from_someplace());
     $user->name('hiratara');
@@ -194,7 +194,7 @@ Class::Accessor::TrackDirty - Define simple entities stored in some places.
     ... blabla ...
 
     # Store it only if $user was really modified.
-    store_into_someplace($user->to_hash) if $user->is_modified;
+    store_into_someplace($user->to_hash) if $user->is_dirty;
 
 =head1 DESCRIPTION
 
