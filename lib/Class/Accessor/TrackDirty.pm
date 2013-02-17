@@ -198,31 +198,72 @@ Class::Accessor::TrackDirty - Define simple entities stored in some places.
 
 =head1 DESCRIPTION
 
-Class::Accessor::TrackDirty defines simple entities stored in files, RDBMS, KVS, and so on.
+Class::Accessor::TrackDirty defines simple entities stored in files, RDBMS,
+KVS, and so on. It tracks dirty columns and you can store it only when the
+instance was really modified.
 
 =head1 INTERFACE
 
 =head2 Functions
 
+=head3 C<< Class::Accessor::TrackDirty->mk_new; >>
+
+Create the C<<new>> methods in your class.
+You can pass a hash-ref or hash-like list to C<<new>> method.
+
+=over 4
+
+=item C<< my $object = YourClass->new({name1 => "value1", ...}); >>
+
+The instance created by C<<new>> is regarded as `dirty' since it hasn't been
+stored yet.
+
+=back
+
 =head3 C<< Class::Accessor::TrackDirty->mk_accessors("name1", "name2", ...); >>
+
+Create accessor methods and helper methods in your class.
+Following helper methods will be created automatically.
+
+=over 4
+
+=item C<< $your_object->is_dirty; >>
+
+Chack that the instance is modified. If it's true, you should store this
+instance into some place through using C<<to_hash>> method.
+
+=item C<< my $hash_ref = $your_object->to_hash; >>
+
+Eject data from this instance as plain hash-ref format.
+C<<$your_object>> is regarded as `clean' after calling this method.
+
+You'd better store C<<$hash_ref>> into some place ASAP. It's up to you how
+C<<$hash_ref>> should be serialized.
+
+=item C<< my $object = YourClass->from_hash({name1 => "value1", ...}); >>
+
+Rebuild the instance from a hash-ref ejected by C<<to_hash>> method.
+The instance constructed by C<<from_hash>> is regarded as `clean'.
+
+=item C<< $your_object->revert; >>
+
+Revert all `dirty' changes. C<<$your_object>> retruns to the point where you
+call C<<new>>, C<<to_hash>>, or C<<from_hash>>.
+
+=back
 
 =head3 C<< Class::Accessor::TrackDirty->mk_volatile_accessors("name1", "name2", ...); >>
 
-=head3 C<< Class::Accessor::TrackDirty->mk_new; >>
+Define the field which isn't tracked. You can freely change these fields,
+and it will never be marked as `dirty'.
 
 =head3 C<< Class::Accessor::TrackDirty->mk_new_and_accessors("name1", "name2", ...); >>
 
-=head3 C<< my $object = YourClass->new({name1 => "value1", ...}); >>
-
-=head3 C<< my $object = YourClass->from_hash({name1 => "value1", ...}); >>
-
-=head3 C<< my $hash_ref = $your_object->to_hash; >>
-
-=head3 C<< my $hash_ref = $your_object->revert; >>
+This method is a combination of C<<mk_accessors>> and C<<mk_new>>.
 
 =head1 SEE ALSO
 
-L<perl>
+L<Class::Accessor>, L<Class::Accessor::Lite>, L<MooseX::TrackDirty::Attributes>, L<Hash::Dirty>
 
 =head1 AUTHOR
 
