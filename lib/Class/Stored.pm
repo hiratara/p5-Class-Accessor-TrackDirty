@@ -4,7 +4,7 @@ use strict;
 use warnings;
 our $VERSION = '0.01';
 
-our $RESERVED_FIELD = '_modified';
+our $RESERVED_FIELD = '_original';
 our $NEW = 'new';
 our $FROM_HASH = 'from_hash';
 our $TO_HASH = 'to_hash';
