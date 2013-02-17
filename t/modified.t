@@ -91,10 +91,13 @@ for (qw(SimpleEntity TestEntity CasualEntity)) {
         is $entity->mtime, 1360918002;
         ok ! $entity->is_dirty, "Don't save the modification of modified";
 
+        $entity->revert;
+        is $entity->mtime, 1360918002, "Can't revert volatile fields";
+
         $entity->key1(36);
         my $hash = $entity->is_dirty ? $entity->to_hash : {};
         is $hash->{key1}, 36;
-        ok ! exists $hash->{mtime}, "Don't store volatile fields";
+        is $hash->{mtime}, 1360918002, "Store volatile fields";
     }
 
     {

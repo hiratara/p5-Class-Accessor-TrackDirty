@@ -65,6 +65,18 @@ sub _make_accessor($$) {
     };
 }
 
+sub _make_volatile_accessor($$) {
+    no strict 'refs';
+    my ($package, $name) = @_;
+
+    *{"$package\::$name"} = sub {
+        my $self = shift;
+        my $value = $self->{$name};
+        $self->{$name} = $_[0] if @_;
+        $value;
+    };
+}
+
 sub _mk_accessors($@) {
     my $package = shift;
     _make_accessor $package => $_ for @_;
@@ -81,10 +93,16 @@ sub _mk_helpers($) {
     # cleate helper methods
     *{"$package\::$FROM_HASH"} = sub {
         my $package = shift;
-        my %origin = ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
-        $clean_fields->(\%origin);
+        my %modified = ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
+        $clean_fields->(\%modified);
 
-        bless {$RESERVED_FIELD => \%origin}, $package;
+        my %origin;
+        for my $name (@$fields) {
+            $origin{$name} = delete $modified{$name} if exists $modified{$name};
+        }
+
+        $modified{$RESERVED_FIELD} = \%origin;
+        bless \%modified, $package;
     };
 
     *{"$package\::$TO_HASH"} = sub {
@@ -95,7 +113,7 @@ sub _mk_helpers($) {
                 # Don't store undefined values.
                 my $v = $self->$_;
                 defined $v ? ($_ => $v) : ();
-            } @$fields),
+            } @$fields, @$volatile_fields),
             lastupdate => time, v => 2,
         );
 
@@ -117,13 +135,13 @@ sub _mk_helpers($) {
 
     *{"$package\::$REVERT"} = sub {
         my $self = shift;
-        %$self = ($RESERVED_FIELD => $self->{$RESERVED_FIELD});
+        delete $self->{$_} for @$fields;
     };
 }
 
 sub _mk_volatile_accessors($@) {
     my $package = shift;
-    _make_accessor $package => $_ for @_;
+    _make_volatile_accessor $package => $_ for @_;
     push @{_package_info($package)->{volatiles}}, @_;
 }
 
@@ -247,8 +265,10 @@ The instance constructed by C<<from_hash>> is regarded as `clean'.
 
 =item C<< $your_object->revert; >>
 
-Revert all `dirty' changes. C<<$your_object>> retruns to the point where you
-call C<<new>>, C<<to_hash>>, or C<<from_hash>>.
+Revert all `dirty' changes. Fields created by C<<mk_accessors>> retruns to
+the point where you call C<<new>>, C<<to_hash>>, or C<<from_hash>>.
+
+The volatile fileds will be never reverted.
 
 =back
 
