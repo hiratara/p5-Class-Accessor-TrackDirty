@@ -19,7 +19,7 @@ all_pod_files_spelling_ok('lib');
 __DATA__
 Masahiro Honma
 hiratara@cpan.org
-Class::Stored
+Class::Accessor::TrackDirty
 
 # computer terms
 API

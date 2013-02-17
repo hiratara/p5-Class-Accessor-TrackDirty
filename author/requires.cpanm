@@ -1,4 +1,4 @@
-# for Class-Stored
+# for Class-Accessor-TrackDirty
 # Makefile.PL
 Module::Install
 Module::Install::AuthorTests

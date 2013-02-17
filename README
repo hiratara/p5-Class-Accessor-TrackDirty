@@ -1,9 +1,9 @@
 NAME
-    Class::Stored - Define simple entities stored in some places.
+    Class::Accessor::TrackDirty - Define simple entities stored in some places.
 
 SYNOPSIS
         package UserInfo;
-        use Class::Stored;
+        use Class::Accessor::TrackDirty;
         fields "name", "password";
         volatile_fields "modified";
 
@@ -23,7 +23,7 @@ SYNOPSIS
         store_into_someplace($user->to_hash) if $user->is_modified;
 
 DESCRIPTION
-    Class::Stored defines simple entities stored in files, RDBMS, KVS, and
+    Class::Accessor::TrackDirty defines simple entities stored in files, RDBMS, KVS, and
     so on.
 
 INTERFACE

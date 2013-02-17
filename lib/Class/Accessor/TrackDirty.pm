@@ -1,4 +1,4 @@
-package Class::Stored;
+package Class::Accessor::TrackDirty;
 use 5.008_001;
 use strict;
 use warnings;
@@ -172,14 +172,14 @@ __END__
 
 =head1 NAME
 
-Class::Stored - Define simple entities stored in some places.
+Class::Accessor::TrackDirty - Define simple entities stored in some places.
 
 =head1 SYNOPSIS
 
     package UserInfo;
-    use Class::Stored;
-    Class::Stored->mk_new_and_accessors("name", "password");
-    Class::Stored->mk_volatile_accessors("modified");
+    use Class::Accessor::TrackDirty;
+    Class::Accessor::TrackDirty->mk_new_and_accessors("name", "password");
+    Class::Accessor::TrackDirty->mk_volatile_accessors("modified");
 
     package main;
     my $user = UserInfo->new({name => 'honma', password => 'F!aS3l'});
@@ -198,19 +198,19 @@ Class::Stored - Define simple entities stored in some places.
 
 =head1 DESCRIPTION
 
-Class::Stored defines simple entities stored in files, RDBMS, KVS, and so on.
+Class::Accessor::TrackDirty defines simple entities stored in files, RDBMS, KVS, and so on.
 
 =head1 INTERFACE
 
 =head2 Functions
 
-=head3 C<< Class::Stored->mk_accessors("name1", "name2", ...); >>
+=head3 C<< Class::Accessor::TrackDirty->mk_accessors("name1", "name2", ...); >>
 
-=head3 C<< Class::Stored->mk_volatile_accessors("name1", "name2", ...); >>
+=head3 C<< Class::Accessor::TrackDirty->mk_volatile_accessors("name1", "name2", ...); >>
 
-=head3 C<< Class::Stored->mk_new; >>
+=head3 C<< Class::Accessor::TrackDirty->mk_new; >>
 
-=head3 C<< Class::Stored->mk_new_and_accessors("name1", "name2", ...); >>
+=head3 C<< Class::Accessor::TrackDirty->mk_new_and_accessors("name1", "name2", ...); >>
 
 =head3 C<< my $object = YourClass->new({name1 => "value1", ...}); >>
 

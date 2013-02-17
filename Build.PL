@@ -19,8 +19,8 @@ my $build = Module::Build->new(
     },
 
     no_index    => { 'directory' => [ 'inc' ] },
-    name        => 'Class/Stored',
-    module_name => 'Class::Stored',
+    name        => 'Class/Accessor/TrackDirty',
+    module_name => 'Class::Accessor::TrackDirty',
 
     # script_files => [''],
 

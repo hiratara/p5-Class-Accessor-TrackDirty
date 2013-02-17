@@ -3,7 +3,7 @@
 .travis.yaml
 Build.PL
 Changes
-lib/Class/Stored.pm
+lib/Class/Accessor/TrackDirty.pm
 MANIFEST			This list of files
 MANIFEST.SKIP
 META.json

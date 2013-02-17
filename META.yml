@@ -13,13 +13,13 @@ license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
-name: Class-Stored
+name: Class-Accessor-TrackDirty
 no_index:
   directory:
     - inc
 provides:
-  Class::Stored:
-    file: lib/Class/Stored.pm
+  Class::Accessor::TrackDirty:
+    file: lib/Class/Accessor/TrackDirty.pm
     version: 0.01
 requires:
   perl: 5.008001

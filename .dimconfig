@@ -1,8 +1,8 @@
 #!perl
 # This file is managed by /Users/tarara/perl5/perlbrew/perls/perl-5.12.2/bin/dim.
 {
-  dist => 'Class::Stored',
-  distdir => 'Class-Stored',
-  module => 'Class::Stored',
+  dist => 'Class::Accessor::TrackDirty',
+  distdir => 'Class-Accessor-TrackDirty',
+  module => 'Class::Accessor::TrackDirty',
   template => 'DefaultMB'
 }
