@@ -268,6 +268,17 @@ The volatile fields will be never reverted.
 
 =back
 
+You'd better *NOT* store references in tracked fields. Though following codes
+work well, to make C<revert> work well, we'll have to copy references deeply
+when you call getter.
+
+  my $your_object = YourClass->new(some_refs => {key => 'value'});
+  # some_refs are copyied deeply :(
+  $your_object->some_refs->{key} = '<censored>';
+
+  $your_object->revert;
+  print $your_object->some_refs, "\n"; # printed "value"
+
 =head3 C<< Class::Accessor::TrackDirty->mk_accessors("name1", "name2", ...); >>
 
 Define the field which isn't tracked. You can freely change these fields,
