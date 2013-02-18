@@ -15,7 +15,9 @@ t/accessor.t
 t/CasualEntity.pm
 t/modified.t
 t/own_constructor.t
+t/own_fields.t
 t/SimpleEntity.pm
+t/store_refs.t
 t/TestEntity.pm
 xt/perlcritic.t
 xt/pod.t
