@@ -16,7 +16,7 @@ our $REVERT = 'revert';
     my %package_info;
     sub _package_info($) {
         my $package = shift;
-        $package_info{$package} //= {tracked_fields => [], fields => []};
+        $package_info{$package} ||= {tracked_fields => [], fields => []};
     }
 }
 
