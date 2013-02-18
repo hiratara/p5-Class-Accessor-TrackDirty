@@ -14,7 +14,7 @@ our $REVERT = 'revert';
 my %package_info;
 sub _package_info($) {
     my $package = shift;
-    $package_info{$package} //= {fields => [], volatiles => []};
+    $package_info{$package} //= {tracked_fields => [], fields => []};
 }
 
 sub _is_different($$) {
@@ -26,15 +26,15 @@ sub _is_different($$) {
     }
 }
 
-sub _fields_cleaner($) {
+sub _tracked_fields_cleaner($) {
     my $package = shift;
-    my ($fields, $volatile_fields) =
-        @{_package_info $package}{qw(fields volatiles)};
+    my ($tracked_fields, $fields) =
+        @{_package_info $package}{qw(tracked_fields fields)};
     sub {
         my $hash_ref = shift;
         for my $k (keys %$hash_ref) {
             delete $hash_ref->{$k} unless grep { $k eq $_ }
-                                               @$fields, @$volatile_fields;
+                                               @$tracked_fields, @$fields;
         }
     };
 };
@@ -77,27 +77,27 @@ sub _make_volatile_accessor($$) {
     };
 }
 
-sub _mk_accessors($@) {
+sub _mk_tracked_accessors($@) {
     my $package = shift;
     _make_accessor $package => $_ for @_;
-    push @{_package_info($package)->{fields}}, @_;
+    push @{_package_info($package)->{tracked_fields}}, @_;
 }
 
 sub _mk_helpers($) {
     no strict 'refs';
     my $package = shift;
-    my ($fields, $volatile_fields) =
-        @{_package_info $package}{qw(fields volatiles)};
-    my $clean_fields = _fields_cleaner($package);
+    my ($tracked_fields, $fields) =
+        @{_package_info $package}{qw(tracked_fields fields)};
+    my $clean_tracked_fields = _tracked_fields_cleaner($package);
 
     # cleate helper methods
     *{"$package\::$FROM_HASH"} = sub {
         my $package = shift;
         my %modified = ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
-        $clean_fields->(\%modified);
+        $clean_tracked_fields->(\%modified);
 
         my %origin;
-        for my $name (@$fields) {
+        for my $name (@$tracked_fields) {
             $origin{$name} = delete $modified{$name} if exists $modified{$name};
         }
 
@@ -113,7 +113,7 @@ sub _mk_helpers($) {
                 # Don't store undefined values.
                 my $v = $self->$_;
                 defined $v ? ($_ => $v) : ();
-            } @$fields, @$volatile_fields),
+            } @$tracked_fields, @$fields),
             lastupdate => time, v => 2,
         );
 
@@ -127,7 +127,7 @@ sub _mk_helpers($) {
         my $self = shift;
         return 1 unless defined $self->{$RESERVED_FIELD};
 
-        for (@$fields) {
+        for (@$tracked_fields) {
             return 1 if exists $self->{$_};
         }
         return;
@@ -135,41 +135,41 @@ sub _mk_helpers($) {
 
     *{"$package\::$REVERT"} = sub {
         my $self = shift;
-        delete $self->{$_} for @$fields;
+        delete $self->{$_} for @$tracked_fields;
     };
 }
 
-sub _mk_volatile_accessors($@) {
+sub _mk_accessors($@) {
     my $package = shift;
     _make_volatile_accessor $package => $_ for @_;
-    push @{_package_info($package)->{volatiles}}, @_;
+    push @{_package_info($package)->{fields}}, @_;
 }
 
 sub _mk_new($) {
     no strict 'refs';
     my $package = shift;
 
-    my $clean_fields = _fields_cleaner($package);
+    my $clean_tracked_fields = _tracked_fields_cleaner($package);
     *{"$package\::$NEW"} = sub {
         my $package = shift;
         my %modified = ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
-        $clean_fields->(\%modified);
+        $clean_tracked_fields->(\%modified);
 
         bless \%modified => $package;
     };
+}
+
+sub mk_tracked_accessors {
+    (undef, my @tracked_fields) = @_;
+    my $package = caller(0);
+    _mk_tracked_accessors $package => @tracked_fields;
+    _mk_helpers $package;
 }
 
 sub mk_accessors {
     (undef, my @fields) = @_;
     my $package = caller(0);
     _mk_accessors $package => @fields;
-    _mk_helpers $package;
-}
-
-sub mk_volatile_accessors {
-    (undef, my @volatiles) = @_;
-    my $package = caller(0);
-    _mk_volatile_accessors $package => @volatiles;
 }
 
 sub mk_new {
@@ -178,9 +178,9 @@ sub mk_new {
 }
 
 sub mk_new_and_accessors {
-    (undef, my @fields) = @_;
+    (undef, my @tracked_fields) = @_;
     my $package = caller(0);
-    _mk_accessors $package => @fields;
+    _mk_tracked_accessors $package => @tracked_fields;
     _mk_helpers $package;
     _mk_new $package;
 }
@@ -197,7 +197,7 @@ Class::Accessor::TrackDirty - Define simple entities stored in some places.
     package UserInfo;
     use Class::Accessor::TrackDirty;
     Class::Accessor::TrackDirty->mk_new_and_accessors("name", "password");
-    Class::Accessor::TrackDirty->mk_volatile_accessors("modified");
+    Class::Accessor::TrackDirty->mk_accessors("modified");
 
     package main;
     my $user = UserInfo->new({name => 'honma', password => 'F!aS3l'});
@@ -238,7 +238,7 @@ stored yet.
 
 =back
 
-=head3 C<< Class::Accessor::TrackDirty->mk_accessors("name1", "name2", ...); >>
+=head3 C<< Class::Accessor::TrackDirty->mk_tracked_accessors("name1", "name2", ...); >>
 
 Create accessor methods and helper methods in your class.
 Following helper methods will be created automatically.
@@ -265,21 +265,21 @@ The instance constructed by C<<from_hash>> is regarded as `clean'.
 
 =item C<< $your_object->revert; >>
 
-Revert all `dirty' changes. Fields created by C<<mk_accessors>> retruns to
+Revert all `dirty' changes. Fields created by C<<mk_tracked_accessors>> retruns to
 the point where you call C<<new>>, C<<to_hash>>, or C<<from_hash>>.
 
 The volatile fileds will be never reverted.
 
 =back
 
-=head3 C<< Class::Accessor::TrackDirty->mk_volatile_accessors("name1", "name2", ...); >>
+=head3 C<< Class::Accessor::TrackDirty->mk_accessors("name1", "name2", ...); >>
 
 Define the field which isn't tracked. You can freely change these fields,
 and it will never be marked as `dirty'.
 
 =head3 C<< Class::Accessor::TrackDirty->mk_new_and_accessors("name1", "name2", ...); >>
 
-This method is a combination of C<<mk_accessors>> and C<<mk_new>>.
+This method is a combination of C<<mk_tracked_accessors>> and C<<mk_new>>.
 
 =head1 SEE ALSO
 
