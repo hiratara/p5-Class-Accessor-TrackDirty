@@ -55,6 +55,8 @@ sub _make_tracked_accessor($$) {
 
     *{"$package\::$name"} = sub {
         my $self = shift;
+
+        # getter
         my $value;
         if (exists $self->{$name}) {
             $value = $self->{$name};
@@ -65,14 +67,8 @@ sub _make_tracked_accessor($$) {
             $value = ($self->{$name} = dclone $value) if ref $value;
         }
 
-        if (@_) {
-            if (! defined $self->{$RESERVED_FIELD}
-                || _is_different $self->{$RESERVED_FIELD}{$name}, $_[0]) {
-                $self->{$name} = $_[0];
-            } else {
-                delete $self->{$name};
-            }
-        }
+        # setter
+        $self->{$name} = $_[0] if @_;
 
         return $value;
     };
