@@ -39,7 +39,7 @@ sub _tracked_fields_cleaner($) {
     };
 };
 
-sub _make_accessor($$) {
+sub _make_tracked_accessor($$) {
     no strict 'refs';
     my ($package, $name) = @_;
 
@@ -65,7 +65,7 @@ sub _make_accessor($$) {
     };
 }
 
-sub _make_volatile_accessor($$) {
+sub _make_accessor($$) {
     no strict 'refs';
     my ($package, $name) = @_;
 
@@ -79,7 +79,7 @@ sub _make_volatile_accessor($$) {
 
 sub _mk_tracked_accessors($@) {
     my $package = shift;
-    _make_accessor $package => $_ for @_;
+    _make_tracked_accessor $package => $_ for @_;
     push @{_package_info($package)->{tracked_fields}}, @_;
 }
 
@@ -141,7 +141,7 @@ sub _mk_helpers($) {
 
 sub _mk_accessors($@) {
     my $package = shift;
-    _make_volatile_accessor $package => $_ for @_;
+    _make_accessor $package => $_ for @_;
     push @{_package_info($package)->{fields}}, @_;
 }
 
