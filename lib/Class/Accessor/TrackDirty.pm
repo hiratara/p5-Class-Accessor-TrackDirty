@@ -36,19 +36,6 @@ sub _is_different($$) {
     }
 }
 
-sub _tracked_fields_cleaner($) {
-    my $package = shift;
-    my ($tracked_fields, $fields) =
-        @{_package_info $package}{qw(tracked_fields fields)};
-    sub {
-        my $hash_ref = shift;
-        for my $k (keys %$hash_ref) {
-            delete $hash_ref->{$k} unless grep { $k eq $_ }
-                                               @$tracked_fields, @$fields;
-        }
-    };
-};
-
 sub _make_tracked_accessor($$) {
     no strict 'refs';
     my ($package, $name) = @_;
@@ -97,13 +84,11 @@ sub _mk_helpers($) {
     my $package = shift;
     my ($tracked_fields, $fields) =
         @{_package_info $package}{qw(tracked_fields fields)};
-    my $clean_tracked_fields = _tracked_fields_cleaner($package);
 
     # cleate helper methods
     *{"$package\::$FROM_HASH"} = sub {
         my $package = shift;
         my %modified = ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
-        $clean_tracked_fields->(\%modified);
 
         my %origin;
         for my $name (@$tracked_fields) {
@@ -160,11 +145,9 @@ sub _mk_new($) {
     no strict 'refs';
     my $package = shift;
 
-    my $clean_tracked_fields = _tracked_fields_cleaner($package);
     *{"$package\::$NEW"} = sub {
         my $package = shift;
         my %modified = ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
-        $clean_tracked_fields->(\%modified);
 
         bless \%modified => $package;
     };
