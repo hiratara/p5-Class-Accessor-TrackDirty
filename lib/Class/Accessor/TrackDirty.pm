@@ -177,7 +177,7 @@ sub mk_new {
     _mk_new $package;
 }
 
-sub mk_new_and_accessors {
+sub mk_new_and_tracked_accessors {
     (undef, my @tracked_fields) = @_;
     my $package = caller(0);
     _mk_tracked_accessors $package => @tracked_fields;
@@ -196,7 +196,7 @@ Class::Accessor::TrackDirty - Define simple entities stored in some places.
 
     package UserInfo;
     use Class::Accessor::TrackDirty;
-    Class::Accessor::TrackDirty->mk_new_and_accessors("name", "password");
+    Class::Accessor::TrackDirty->mk_new_and_tracked_accessors("name", "password");
     Class::Accessor::TrackDirty->mk_accessors("modified");
 
     package main;
@@ -277,7 +277,7 @@ The volatile fileds will be never reverted.
 Define the field which isn't tracked. You can freely change these fields,
 and it will never be marked as `dirty'.
 
-=head3 C<< Class::Accessor::TrackDirty->mk_new_and_accessors("name1", "name2", ...); >>
+=head3 C<< Class::Accessor::TrackDirty->mk_new_and_tracked_accessors("name1", "name2", ...); >>
 
 This method is a combination of C<<mk_tracked_accessors>> and C<<mk_new>>.
 
