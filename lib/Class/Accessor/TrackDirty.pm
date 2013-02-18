@@ -247,7 +247,7 @@ Following helper methods will be created automatically.
 
 =item C<< $your_object->is_dirty; >>
 
-Chack that the instance is modified. If it's true, you should store this
+Check that the instance is modified. If it's true, you should store this
 instance into some place through using C<<to_hash>> method.
 
 =item C<< my $hash_ref = $your_object->to_hash; >>
@@ -265,10 +265,10 @@ The instance constructed by C<<from_hash>> is regarded as `clean'.
 
 =item C<< $your_object->revert; >>
 
-Revert all `dirty' changes. Fields created by C<<mk_tracked_accessors>> retruns to
+Revert all `dirty' changes. Fields created by C<<mk_tracked_accessors>> returns to
 the point where you call C<<new>>, C<<to_hash>>, or C<<from_hash>>.
 
-The volatile fileds will be never reverted.
+The volatile fields will be never reverted.
 
 =back
 
