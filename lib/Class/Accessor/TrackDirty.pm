@@ -2,6 +2,7 @@ package Class::Accessor::TrackDirty;
 use 5.008_001;
 use strict;
 use warnings;
+use Storable qw(dclone freeze);
 our $VERSION = '0.01';
 
 our $RESERVED_FIELD = '_original';
@@ -17,10 +18,19 @@ sub _package_info($) {
     $package_info{$package} //= {tracked_fields => [], fields => []};
 }
 
+sub _is_different_deeply($$) {
+    my ($ref_x, $ref_y) = @_;
+    (freeze $ref_x) ne (freeze $ref_y);
+}
+
 sub _is_different($$) {
     my ($x, $y) = @_;
     if (defined $x && defined $y) {
-        return $x ne $y;
+        if (ref $x && ref $y) {
+            return _is_different_deeply $x, $y;
+        } else {
+            return ref $x || ref $y || $x ne $y;
+        }
     } else {
         return defined $x || defined $y;
     }
@@ -50,6 +60,9 @@ sub _make_tracked_accessor($$) {
             $value = $self->{$name};
         } elsif (defined $self->{$RESERVED_FIELD})  {
             $value = $self->{$RESERVED_FIELD}{$name};
+
+            # Defensive copying
+            $value = ($self->{$name} = dclone $value) if ref $value;
         }
 
         if (@_) {
@@ -128,7 +141,9 @@ sub _mk_helpers($) {
         return 1 unless defined $self->{$RESERVED_FIELD};
 
         for (@$tracked_fields) {
-            return 1 if exists $self->{$_};
+            return 1
+                if exists $self->{$_} &&
+                   _is_different $self->{$_}, $self->{$RESERVED_FIELD}{$_};
         }
         return;
     };
