@@ -110,7 +110,6 @@ sub _mk_helpers($) {
                 my $v = $self->$_;
                 defined $v ? ($_ => $v) : ();
             } @$tracked_fields, @$fields),
-            lastupdate => time, v => 2,
         );
 
         # rewrite the caller directly
