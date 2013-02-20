@@ -41,6 +41,7 @@ destructors
 destructuring
 dev
 DWIM
+getter
 GitHub
 hashrefs
 hotspots
