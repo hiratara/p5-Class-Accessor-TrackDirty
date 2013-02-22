@@ -17,6 +17,10 @@ name: Class-Accessor-TrackDirty
 no_index:
   directory:
     - inc
+provides:
+  Class::Accessor::TrackDirty:
+    file: lib/Class/Accessor/TrackDirty.pm
+    version: 0.01
 requires:
   perl: 5.008001
 resources:

@@ -1,5 +1,5 @@
 Revision history for Perl extension Class::Accessor::TrackDirty
 
-NEXT <<SET RELEASE DATE HERE>>
+0.01 February 22, 2013
     - original version; created by dim
       at Sat Feb 16 12:19:36 2013.
