@@ -112,8 +112,8 @@ sub _mk_helpers($) {
             } @$tracked_fields, @$fields),
         );
 
-        # rewrite the caller directly
-        %$self = %{(ref $self)->from_hash(\%hash)};
+        # Move published data for cleaning.
+        $self->{$RESERVED_FIELD}{$_} = delete $self->{$_} for @$tracked_fields;
 
         return \%hash;
     };
