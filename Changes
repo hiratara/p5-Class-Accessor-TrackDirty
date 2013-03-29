@@ -1,5 +1,9 @@
 Revision history for Perl extension Class::Accessor::TrackDirty
 
+0.03 March 29, 2013
+    - Fix the bug by which to_hash() may break $self again.
+      Don't use Class::Accessor::TrackDirty-0.02.
+
 0.02 March 29, 2013
     - Fix the bug by which to_hash() may break $self.
 

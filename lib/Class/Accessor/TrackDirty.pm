@@ -3,7 +3,7 @@ use 5.008_001;
 use strict;
 use warnings;
 use Storable qw(dclone freeze);
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our $RESERVED_FIELD = '_original';
 our $NEW = 'new';
