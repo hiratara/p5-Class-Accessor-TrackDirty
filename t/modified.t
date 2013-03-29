@@ -110,6 +110,18 @@ for (qw(SimpleEntity TestEntity CasualEntity)) {
         });
         ok ! $entity->is_dirty, "You mustn't set is_dirty.";
     }
+
+    {
+        # To reproduce bugs of to_hash(), call to_hash twice.
+        my $entity = "t::$_"->from_hash({key1 => 36, key2 => "hiratara", mtime => 12345});
+        $entity->to_hash;
+        $entity->to_hash;
+
+        ok ! $entity->is_dirty;
+        is $entity->key1, 36;
+        is $entity->key2, "hiratara";
+        is $entity->mtime, "12345";
+    }
 }
 
 done_testing;

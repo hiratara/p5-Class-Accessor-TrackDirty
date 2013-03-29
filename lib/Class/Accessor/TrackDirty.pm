@@ -113,7 +113,8 @@ sub _mk_helpers($) {
         );
 
         # Move published data for cleaning.
-        $self->{$RESERVED_FIELD}{$_} = delete $self->{$_} for @$tracked_fields;
+        $self->{$RESERVED_FIELD}{$_} = delete $self->{$_}
+                              for grep { exists $self->{$_} } @$tracked_fields;
 
         return \%hash;
     };
