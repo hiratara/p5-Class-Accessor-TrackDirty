@@ -113,7 +113,7 @@ sub _mk_helpers($) {
         );
 
         # rewrite the caller directly
-        $_[0] = (ref $self)->from_hash(\%hash);
+        %$self = %{(ref $self)->from_hash(\%hash)};
 
         return \%hash;
     };

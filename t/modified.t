@@ -72,10 +72,14 @@ for (qw(SimpleEntity TestEntity CasualEntity)) {
         # Freeze all changes
         $entity->key1(36);
         $entity->key2('hiratara');
+
+        my $entity_alias = $entity;
         my $hash = $entity->to_hash;
         is $hash->{key1}, 36;
         is $entity->key1, 36;
         ok ! $entity->is_dirty, "Reset the is_dirty field";
+        is int($entity), int($entity_alias), "to_hash shouldn't break refs.";
+        ok ! $entity_alias->is_dirty, "Aliases is also cleaned.";
     }
 
     {
