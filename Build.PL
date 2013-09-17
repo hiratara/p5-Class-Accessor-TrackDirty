@@ -1,32 +1,3 @@
-#!perl
-use strict;
-use warnings;
-use Module::Build;
-
-my $build = Module::Build->new(
-    license        => 'perl',
-    dynamic_config => 0,
-    # dist_abstract  => 'XXX',
-
-    build_requires     => {
-        'Test::More'     => '0.98',
-        'Test::Requires' => '0.06',
-    },
-    configure_requires => { 'Module::Build' => '0.38' },
-    requires           => {
-        perl         => '5.008001',
-        # 'parent'     => 0,
-    },
-
-    no_index    => { 'directory' => [ 'inc' ] },
-    name        => 'Class/Accessor/TrackDirty',
-    module_name => 'Class::Accessor::TrackDirty',
-
-    # script_files => [''],
-
-    test_files           => (-d '.git' || $ENV{RELEASE_TESTING}) ? 't/ xt/' : 't/',
-    recursive_test_files => 1,
-
-    create_readme      => 1,
-);
-$build->create_build_script;
+use 5.008001;
+use Module::Build::Tiny 0.026;
+Build_PL();

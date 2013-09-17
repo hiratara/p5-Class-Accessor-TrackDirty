@@ -184,6 +184,8 @@ sub mk_new_and_tracked_accessors {
 1;
 __END__
 
+=encoding utf-8
+
 =head1 NAME
 
 Class::Accessor::TrackDirty - Define simple entities stored in some places.
