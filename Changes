@@ -1,6 +1,8 @@
 Revision history for Perl extension Class::Accessor::TrackDirty
 
 {{$NEXT}}
+
+0.04  2013-09-17 15:30:00 JST
     - Start using Dist-Milla
 
 0.03 March 29, 2013
