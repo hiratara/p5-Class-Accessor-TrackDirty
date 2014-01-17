@@ -36,6 +36,10 @@ for (qw(SimpleEntity TestEntity CasualEntity)) {
         is $entity->key1, 18, "Ordinary use after reverting.";
         ok $entity->is_dirty, "The key1 field was modified.";
         ok $entity->is_new, "The new data";
+
+        (undef) = $entity->to_hash;
+        ok ! $entity->is_dirty, "All modified columns are stored";
+        ok ! $entity->is_new, "Stored in a storage";
     }
 
     {
