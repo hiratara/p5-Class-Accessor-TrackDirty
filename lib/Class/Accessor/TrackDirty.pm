@@ -8,6 +8,7 @@ our $VERSION = '0.04';
 our $RESERVED_FIELD = '_original';
 our $NEW = 'new';
 our $FROM_HASH = 'from_hash';
+our $RAW = 'raw';
 our $TO_HASH = 'to_hash';
 our $IS_MODIFIED = 'is_dirty';
 our $IS_NEW = 'is_new';
@@ -102,7 +103,7 @@ sub _mk_helpers($) {
         bless \%modified, $package;
     };
 
-    *{"$package\::$TO_HASH"} = sub {
+    *{"$package\::$RAW"} = sub {
         my ($self) = @_;
 
         my %hash = (
@@ -113,12 +114,19 @@ sub _mk_helpers($) {
             } @$tracked_fields, @$fields),
         );
 
+        return \%hash;
+    };
+
+    *{"$package\::$TO_HASH"} = sub {
+        my ($self) = @_;
+        my $raw = $self->raw;
+
         # Move published data for cleaning.
         $self->{$RESERVED_FIELD} ||= {};
         $self->{$RESERVED_FIELD}{$_} = delete $self->{$_}
                               for grep { exists $self->{$_} } @$tracked_fields;
 
-        return \%hash;
+        return $raw;
     };
 
     *{"$package\::$IS_MODIFIED"} = sub {
@@ -268,6 +276,12 @@ C<<$your_object>> is regarded as `clean' after calling this method.
 
 You'd better store C<<$hash_ref>> into some place ASAP. It's up to you how
 C<<$hash_ref>> should be serialized.
+
+=item C<< $your_object->raw; >>
+
+Retrieves the row data from the instance. The return value is the same as
+C<to_hash> method, but this method doesn't change the state of the
+instance.
 
 =item C<< my $object = YourClass->from_hash({name1 => "value1", ...}); >>
 
