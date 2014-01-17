@@ -1,6 +1,7 @@
 Revision history for Perl module Class::Accessor::TrackDirty
 
 {{$NEXT}}
+    - Implement is_new method
 
 0.04  2013-09-17 15:30:00 JST
     - Start using Dist-Milla

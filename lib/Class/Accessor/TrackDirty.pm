@@ -10,6 +10,7 @@ our $NEW = 'new';
 our $FROM_HASH = 'from_hash';
 our $TO_HASH = 'to_hash';
 our $IS_MODIFIED = 'is_dirty';
+our $IS_NEW = 'is_new';
 our $REVERT = 'revert';
 
 {
@@ -113,6 +114,7 @@ sub _mk_helpers($) {
         );
 
         # Move published data for cleaning.
+        $self->{$RESERVED_FIELD} ||= {};
         $self->{$RESERVED_FIELD}{$_} = delete $self->{$_}
                               for grep { exists $self->{$_} } @$tracked_fields;
 
@@ -129,6 +131,11 @@ sub _mk_helpers($) {
                    _is_different $self->{$_}, $self->{$RESERVED_FIELD}{$_};
         }
         return;
+    };
+
+    *{"$package\::$IS_NEW"} = sub {
+        my $self = shift;
+        exists $self->{$RESERVED_FIELD} ? 0 : 1;
     };
 
     *{"$package\::$REVERT"} = sub {
@@ -247,6 +254,12 @@ Following helper methods will be created automatically.
 
 Check that the instance is modified. If it's true, you should store this
 instance into some place through using C<<to_hash>> method.
+
+=item C<< $your_object->is_new; >>
+
+Checks if the instance might be in a storage. Returns false value when
+the instance comes from C<from_hash> method, or after you call
+C<to_hash> method.
 
 =item C<< my $hash_ref = $your_object->to_hash; >>
 

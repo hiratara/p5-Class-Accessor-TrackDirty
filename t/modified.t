@@ -11,22 +11,31 @@ for (qw(SimpleEntity TestEntity CasualEntity)) {
         ok $entity->is_dirty, "The new entity should be stored";
         $entity->is_dirty(undef);
         ok $entity->is_dirty, "You can't modify is_dirty.";
+        ok $entity->is_new, "The new data";
 
         $entity->revert;
         is $entity->key1, undef, "All fields shoud be removed.";
         ok $entity->is_dirty, "The new entity should be stored";
+        ok $entity->is_new, "The new data";
+
+        (undef) = $entity->to_hash;
+        ok ! $entity->is_dirty, "All modified columns are stored";
+        ok ! $entity->is_new, "Stored in a storage";
     }
 
     {
         my $entity = "t::$_"->new({});
         ok $entity->is_dirty, "Save empty data";
+        ok $entity->is_new, "The new data";
 
         $entity->revert;
         ok $entity->is_dirty, "Is reverted but it has not been serialized.";
+        ok $entity->is_new, "The new data";
 
         $entity->key1(18);
         is $entity->key1, 18, "Ordinary use after reverting.";
         ok $entity->is_dirty, "The key1 field was modified.";
+        ok $entity->is_new, "The new data";
     }
 
     {
@@ -37,6 +46,7 @@ for (qw(SimpleEntity TestEntity CasualEntity)) {
 
         $entity->revert;
         ok $entity->is_dirty, "Is reverted but it has not been serialized.";
+        ok $entity->is_new, "The new data";
     }
 
     {
@@ -44,23 +54,29 @@ for (qw(SimpleEntity TestEntity CasualEntity)) {
             key1 => 35,
         });
         ok ! $entity->is_dirty, "need not store the loaded data";
+        ok ! $entity->is_new, "Fetched from a storage";
         $entity->is_dirty(1);
+        $entity->is_new(1);
         ok ! $entity->is_dirty, "You can't modify is_dirty.";
+        ok ! $entity->is_new, "You can't modify is_new.";
 
         $entity->key1(35);
         $entity->key2(undef);
         ok ! $entity->is_dirty, "I didn't change anything :p";
         ok ! $entity->is_dirty, "I didn't change anything :p";
+        ok ! $entity->is_new, "Fetched from a storage";
 
         $entity->key1(36);
         $entity->key2("something");
         ok $entity->is_dirty, "Changed";
         ok $entity->is_dirty, "Changed";
+        ok ! $entity->is_new, "Fetched from a storage";
 
         $entity->key1(35);
         $entity->key2(undef);
         ok ! $entity->is_dirty, "Finally return to the original value :p";
         ok ! $entity->is_dirty, "Finally return to the original value :p";
+        ok ! $entity->is_new, "Fetched from a storage";
 
         $entity->key1(36);
         $entity->key2("something");
@@ -68,6 +84,7 @@ for (qw(SimpleEntity TestEntity CasualEntity)) {
         is $entity->key1, 35, "reverted changes";
         is $entity->key2, undef, "reverted changes";
         ok ! $entity->is_dirty, "reverted all statuses";
+        ok ! $entity->is_new, "Fetched from a storage";
 
         # Freeze all changes
         $entity->key1(36);
@@ -78,8 +95,10 @@ for (qw(SimpleEntity TestEntity CasualEntity)) {
         is $hash->{key1}, 36;
         is $entity->key1, 36;
         ok ! $entity->is_dirty, "Reset the is_dirty field";
+        ok ! $entity->is_new, "Saved into a storage";
         is int($entity), int($entity_alias), "to_hash shouldn't break refs.";
         ok ! $entity_alias->is_dirty, "Aliases is also cleaned.";
+        ok ! $entity->is_new, "Saved into a storage";
     }
 
     {
@@ -94,6 +113,7 @@ for (qw(SimpleEntity TestEntity CasualEntity)) {
 
         is $entity->mtime, 1360918002;
         ok ! $entity->is_dirty, "Don't save the modification of modified";
+        ok ! $entity->is_new, "Fetched from a storage";
 
         $entity->revert;
         is $entity->mtime, 1360918002, "Can't revert volatile fields";
@@ -107,8 +127,10 @@ for (qw(SimpleEntity TestEntity CasualEntity)) {
     {
         my $entity = "t::$_"->from_hash({
             is_dirty => 1,
+            is_new => 1,
         });
         ok ! $entity->is_dirty, "You mustn't set is_dirty.";
+        ok ! $entity->is_new, "You mustn't set is_new";
     }
 
     {
@@ -118,6 +140,7 @@ for (qw(SimpleEntity TestEntity CasualEntity)) {
         $entity->to_hash;
 
         ok ! $entity->is_dirty;
+        ok ! $entity->is_new, "Fetched from a storage";
         is $entity->key1, 36;
         is $entity->key2, "hiratara";
         is $entity->mtime, "12345";
