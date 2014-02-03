@@ -36,12 +36,12 @@ instance was really modified.
 
 ### `Class::Accessor::TrackDirty->mk_new;`
 
-Create the `<new`\> methods in your class.
-You can pass a hash-ref or hash-like list to `<new`\> method.
+Create the `<new`> methods in your class.
+You can pass a hash-ref or hash-like list to `<new`> method.
 
 - `my $object = YourClass->new({name1 => "value1", ...});`
 
-    The instance created by `<new`\> is regarded as \`dirty' since it hasn't been
+    The instance created by `<new`> is regarded as \`dirty' since it hasn't been
     stored yet.
 
 ### `Class::Accessor::TrackDirty->mk_tracked_accessors("name1", "name2", ...);`
@@ -52,25 +52,37 @@ Following helper methods will be created automatically.
 - `$your_object->is_dirty;`
 
     Check that the instance is modified. If it's true, you should store this
-    instance into some place through using `<to_hash`\> method.
+    instance into some place through using `<to_hash`> method.
+
+- `$your_object->is_new;`
+
+    Checks if the instance might be in a storage. Returns false value when
+    the instance comes from `from_hash` method, or after you call
+    `to_hash` method.
 
 - `my $hash_ref = $your_object->to_hash;`
 
     Eject data from this instance as plain hash-ref format.
-    `<$your_object`\> is regarded as \`clean' after calling this method.
+    `<$your_object`> is regarded as \`clean' after calling this method.
 
-    You'd better store `<$hash_ref`\> into some place ASAP. It's up to you how
-    `<$hash_ref`\> should be serialized.
+    You'd better store `<$hash_ref`> into some place ASAP. It's up to you how
+    `<$hash_ref`> should be serialized.
+
+- `$your_object->raw;`
+
+    Retrieves the row data from the instance. The return value is the same as
+    `to_hash` method, but this method doesn't change the state of the
+    instance.
 
 - `my $object = YourClass->from_hash({name1 => "value1", ...});`
 
-    Rebuild the instance from a hash-ref ejected by `<to_hash`\> method.
-    The instance constructed by `<from_hash`\> is regarded as \`clean'.
+    Rebuild the instance from a hash-ref ejected by `<to_hash`> method.
+    The instance constructed by `<from_hash`> is regarded as \`clean'.
 
 - `$your_object->revert;`
 
-    Revert all \`dirty' changes. Fields created by `<mk_tracked_accessors`\> returns to
-    the point where you call `<new`\>, `<to_hash`\>, or `<from_hash`\>.
+    Revert all \`dirty' changes. Fields created by `<mk_tracked_accessors`> returns to
+    the point where you call `<new`>, `<to_hash`>, or `<from_hash`>.
 
     The volatile fields will be never reverted.
 
@@ -92,11 +104,11 @@ and it will never be marked as \`dirty'.
 
 ### `Class::Accessor::TrackDirty->mk_new_and_tracked_accessors("name1", "name2", ...);`
 
-This method is a combination of `<mk_tracked_accessors`\> and `<mk_new`\>.
+This method is a combination of `<mk_tracked_accessors`> and `<mk_new`>.
 
 # SEE ALSO
 
-[Class::Accessor](http://search.cpan.org/perldoc?Class::Accessor), [Class::Accessor::Lite](http://search.cpan.org/perldoc?Class::Accessor::Lite), [MooseX::TrackDirty::Attributes](http://search.cpan.org/perldoc?MooseX::TrackDirty::Attributes), [Hash::Dirty](http://search.cpan.org/perldoc?Hash::Dirty)
+[Class::Accessor](https://metacpan.org/pod/Class::Accessor), [Class::Accessor::Lite](https://metacpan.org/pod/Class::Accessor::Lite), [MooseX::TrackDirty::Attributes](https://metacpan.org/pod/MooseX::TrackDirty::Attributes), [Hash::Dirty](https://metacpan.org/pod/Hash::Dirty)
 
 # AUTHOR
 

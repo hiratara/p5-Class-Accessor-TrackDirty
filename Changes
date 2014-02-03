@@ -1,6 +1,8 @@
 Revision history for Perl module Class::Accessor::TrackDirty
 
 {{$NEXT}}
+
+0.05  2014-02-03 21:23:18 JST
     - Implement raw() and is_new() methods
 
 0.04  2013-09-17 15:30:00 JST
