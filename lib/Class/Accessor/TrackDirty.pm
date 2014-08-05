@@ -20,7 +20,7 @@ our $REVERT = 'revert';
     my %package_info;
     sub _package_info($) {
         my $package = shift;
-        $package_info{$package} ||= {tracked_fields => [], fields => []};
+        $package_info{$package} ||= {tracked_fields => {}, fields => {}};
     }
 }
 
@@ -82,7 +82,7 @@ sub _make_accessor($$) {
 sub _mk_tracked_accessors($@) {
     my $package = shift;
     _make_tracked_accessor $package => $_ for @_;
-    push @{_package_info($package)->{tracked_fields}}, @_;
+    @{(_package_info $package)->{tracked_fields}}{@_} = (1,) x @_;
 }
 
 sub _mk_helpers($) {
@@ -97,7 +97,7 @@ sub _mk_helpers($) {
         my %modified = ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
 
         my %origin;
-        for my $name (@$tracked_fields) {
+        for my $name (keys %$tracked_fields) {
             $origin{$name} = delete $modified{$name} if exists $modified{$name};
         }
 
@@ -113,7 +113,7 @@ sub _mk_helpers($) {
                 # Don't store undefined values.
                 my $v = $self->$_;
                 defined $v ? ($_ => $v) : ();
-            } @$tracked_fields, @$fields),
+            } keys %$tracked_fields, keys %$fields),
         );
 
         return \%hash;
@@ -126,16 +126,17 @@ sub _mk_helpers($) {
         # Move published data for cleaning.
         $self->{$RESERVED_FIELD} ||= {};
         $self->{$RESERVED_FIELD}{$_} = delete $self->{$_}
-                              for grep { exists $self->{$_} } @$tracked_fields;
+                         for grep { exists $self->{$_} } keys %$tracked_fields;
 
         return $raw;
     };
 
     *{"$package\::$IS_MODIFIED"} = sub {
         my ($self, $field) = @_;
-        return any { $self->$IS_MODIFIED($_) } @$tracked_fields unless $field;
+        return any { $self->$IS_MODIFIED($_) } keys %$tracked_fields
+                                                                 unless $field;
 
-        return unless any { $field eq $_ } @$tracked_fields;
+        return unless $tracked_fields->{$field};
         return 1 unless defined $self->{$RESERVED_FIELD};
 
         exists $self->{$field} &&
@@ -144,7 +145,7 @@ sub _mk_helpers($) {
 
     *{"$package\::$MODIFIED_FIELDS"} = sub {
         my $self = shift;
-        grep { $self->$IS_MODIFIED($_) } @$tracked_fields;
+        grep { $self->$IS_MODIFIED($_) } keys %$tracked_fields;
     };
 
     *{"$package\::$IS_NEW"} = sub {
@@ -154,14 +155,14 @@ sub _mk_helpers($) {
 
     *{"$package\::$REVERT"} = sub {
         my $self = shift;
-        delete $self->{$_} for @$tracked_fields;
+        delete $self->{$_} for keys %$tracked_fields;
     };
 }
 
 sub _mk_accessors($@) {
     my $package = shift;
     _make_accessor $package => $_ for @_;
-    push @{_package_info($package)->{fields}}, @_;
+    @{(_package_info $package)->{fields}}{@_} = (1,) x @_;
 }
 
 sub _mk_new($) {
