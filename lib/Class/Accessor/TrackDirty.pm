@@ -231,6 +231,10 @@ Class::Accessor::TrackDirty - Define simple entities stored in some places.
     $user->name('honma'); # I can't make up my mind...
     # ... blabla ...
 
+    # Check the status of fields if needed
+    $user->is_dirty('name') and warn "Did you change name?";
+    my @dirty_fields = $user->dirty_fields;
+
     # Store it only if $user was really modified.
     store_into_someplace($user->to_hash) if $user->is_dirty;
 
@@ -266,9 +270,17 @@ Following helper methods will be created automatically.
 =over 4
 
 =item C<< $your_object->is_dirty; >>
+=item C<< $your_object->is_dirty("field_name"); >>
 
 Check that the instance is modified. If it's true, you should store this
 instance into some place through using C<<to_hash>> method.
+
+When you pass the name of a field, you can know if the field contains the same
+value as the stored object.
+
+=item C<< my @fields = $your_object->dirty_fields; >>
+
+Gets the name of all dirty fields of C<$your_object>.
 
 =item C<< $your_object->is_new; >>
 
