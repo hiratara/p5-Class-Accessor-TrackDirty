@@ -2,6 +2,7 @@ package Class::Accessor::TrackDirty;
 use 5.008_001;
 use strict;
 use warnings;
+use List::MoreUtils qw(any);
 use Storable qw(dclone freeze);
 our $VERSION = '0.05';
 
@@ -11,6 +12,7 @@ our $FROM_HASH = 'from_hash';
 our $RAW = 'raw';
 our $TO_HASH = 'to_hash';
 our $IS_MODIFIED = 'is_dirty';
+our $MODIFIED_FIELDS = 'dirty_fields';
 our $IS_NEW = 'is_new';
 our $REVERT = 'revert';
 
@@ -130,15 +132,19 @@ sub _mk_helpers($) {
     };
 
     *{"$package\::$IS_MODIFIED"} = sub {
-        my $self = shift;
+        my ($self, $field) = @_;
+        return any { $self->$IS_MODIFIED($_) } @$tracked_fields unless $field;
+
+        return unless any { $field eq $_ } @$tracked_fields;
         return 1 unless defined $self->{$RESERVED_FIELD};
 
-        for (@$tracked_fields) {
-            return 1
-                if exists $self->{$_} &&
-                   _is_different $self->{$_}, $self->{$RESERVED_FIELD}{$_};
-        }
-        return;
+        exists $self->{$field} &&
+               _is_different $self->{$field}, $self->{$RESERVED_FIELD}{$field};
+    };
+
+    *{"$package\::$MODIFIED_FIELDS"} = sub {
+        my $self = shift;
+        grep { $self->$IS_MODIFIED($_) } @$tracked_fields;
     };
 
     *{"$package\::$IS_NEW"} = sub {
