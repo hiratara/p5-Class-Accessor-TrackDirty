@@ -40,6 +40,7 @@
       },
       "runtime" : {
          "requires" : {
+            "List::MoreUtils" : "0",
             "perl" : "5.008001"
          }
       },
@@ -64,6 +65,7 @@
    },
    "version" : "0.05",
    "x_contributors" : [
+      "Masahiro Honma <tarara@hirataraDebian.hiratara.local>",
       "Neil Bowers <neil@bowers.com>",
       "hiratara <hiratara@cpan.org>"
    ]

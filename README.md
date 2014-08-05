@@ -21,6 +21,10 @@ Class::Accessor::TrackDirty - Define simple entities stored in some places.
     $user->name('honma'); # I can't make up my mind...
     # ... blabla ...
 
+    # Check the status of fields if needed
+    $user->is_dirty('name') and warn "Did you change name?";
+    my @dirty_fields = $user->dirty_fields;
+
     # Store it only if $user was really modified.
     store_into_someplace($user->to_hash) if $user->is_dirty;
 
@@ -50,9 +54,17 @@ Create accessor methods and helper methods in your class.
 Following helper methods will be created automatically.
 
 - `$your_object->is_dirty;`
+=item `$your_object->is_dirty("field_name");`
 
     Check that the instance is modified. If it's true, you should store this
     instance into some place through using `<to_hash`> method.
+
+    When you pass the name of a field, you can know if the field contains the same
+    value as the stored object.
+
+- `my @fields = $your_object->dirty_fields;`
+
+    Gets the name of all dirty fields of `$your_object`.
 
 - `$your_object->is_new;`
 
