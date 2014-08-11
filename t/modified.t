@@ -149,6 +149,24 @@ for (qw(SimpleEntity TestEntity CasualEntity)) {
         is $entity->key2, "hiratara";
         is $entity->mtime, "12345";
     }
+
+    {
+        my $entity = "t::$_"->from_hash({key1 => 'foo', key2 => 'bar', mtime => 12345});
+        is_deeply [ $entity->dirty_keys ], [];
+        is_deeply $entity->dirty_data, {};
+
+        $entity->mtime(67890);
+        is_deeply [ sort $entity->dirty_keys ], [], 'Field is not tracked';
+        is_deeply $entity->dirty_data, {};
+
+        $entity->key1('baz');
+        is_deeply [ sort $entity->dirty_keys ], ['key1'];
+        is_deeply $entity->dirty_data, {key1 => 'baz'};
+
+        $entity->key2('qux');
+        is_deeply [ sort $entity->dirty_keys ], ['key1', 'key2'];
+        is_deeply $entity->dirty_data, {key1 => 'baz', key2 => 'qux'};
+    };
 }
 
 done_testing;

@@ -13,6 +13,8 @@ our $TO_HASH = 'to_hash';
 our $IS_MODIFIED = 'is_dirty';
 our $IS_NEW = 'is_new';
 our $REVERT = 'revert';
+our $MODIFIED_KEYS = 'dirty_keys';
+our $MODIFIED_HASH = 'dirty_data';
 
 {
     my %package_info;
@@ -119,7 +121,7 @@ sub _mk_helpers($) {
 
     *{"$package\::$TO_HASH"} = sub {
         my ($self) = @_;
-        my $raw = $self->raw;
+        my $raw = $self->$RAW;
 
         # Move published data for cleaning.
         $self->{$RESERVED_FIELD} ||= {};
@@ -149,6 +151,26 @@ sub _mk_helpers($) {
     *{"$package\::$REVERT"} = sub {
         my $self = shift;
         delete $self->{$_} for @$tracked_fields;
+    };
+
+    *{"$package\::$MODIFIED_KEYS"} = sub {
+        my $self = shift;
+        return map { exists $self->{$_} ? $_ : () } @$tracked_fields
+            unless defined $self->{$RESERVED_FIELD};
+
+        my @keys;
+        for (@$tracked_fields) {
+            push @keys, $_ if exists $self->{$_} &&
+                _is_different $self->{$_}, $self->{$RESERVED_FIELD}{$_};
+        }
+
+        return @keys;
+    };
+
+    *{"$package\::$MODIFIED_HASH"} = sub {
+        my $self = shift;
+        my %hash = map { ($_, $self->{$_}) } $self->$MODIFIED_KEYS;
+        \%hash;
     };
 }
 
