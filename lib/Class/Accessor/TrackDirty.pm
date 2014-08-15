@@ -121,7 +121,7 @@ sub _mk_helpers($) {
 
     *{"$package\::$TO_HASH"} = sub {
         my ($self) = @_;
-        my $raw = $self->raw;
+        my $raw = $self->$RAW;
 
         # Move published data for cleaning.
         $self->{$RESERVED_FIELD} ||= {};
