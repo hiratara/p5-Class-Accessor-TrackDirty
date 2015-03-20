@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use List::MoreUtils qw(any);
 use Storable qw(dclone freeze);
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 our $RESERVED_FIELD = '_original';
 our $NEW = 'new';
@@ -133,7 +133,7 @@ sub _mk_helpers($) {
 
     *{"$package\::$IS_MODIFIED"} = sub {
         my ($self, $field) = @_;
-        return any { $self->$IS_MODIFIED($_) } keys %$tracked_fields
+        return ( any { $self->$IS_MODIFIED($_) } keys %$tracked_fields ) || undef
                                                                  unless $field;
 
         return unless $tracked_fields->{$field};
