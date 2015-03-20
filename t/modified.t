@@ -149,6 +149,12 @@ for (qw(SimpleEntity TestEntity CasualEntity)) {
         is $entity->key2, "hiratara";
         is $entity->mtime, "12345";
     }
+
+    {
+        my $entity = "t::$_"->new({});
+        (undef) = $entity->to_hash;
+        is $entity->is_dirty,undef, "is_dirty is undef in a false case";
+    }
 }
 
 done_testing;
