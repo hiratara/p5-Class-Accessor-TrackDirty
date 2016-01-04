@@ -4,33 +4,34 @@
       "Masahiro Honma <hiratara@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.5, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "Dist::Zilla version 5.042, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Class-Accessor-TrackDirty",
    "no_index" : {
       "directory" : [
-         "t",
-         "xt",
+         "eg",
+         "examples",
          "inc",
          "share",
-         "eg",
-         "examples"
+         "t",
+         "xt"
       ]
    },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.037"
+            "Module::Build::Tiny" : "0.034"
          }
       },
       "develop" : {
          "requires" : {
+            "Dist::Milla" : "v1.0.15",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "0",
@@ -66,8 +67,7 @@
    "version" : "0.06",
    "x_contributors" : [
       "Masahiro Honma <tarara@hirataraDebian.hiratara.local>",
-      "Neil Bowers <neil@bowers.com>",
-      "hiratara <hiratara@cpan.org>"
+      "Neil Bowers <neil@bowers.com>"
    ]
 }
 
