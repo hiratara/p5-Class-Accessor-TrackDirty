@@ -15,7 +15,7 @@ for (qw(SimpleEntity TestEntity CasualEntity)) {
 
         $entity->revert;
         is $entity->key1, undef, "All fields shoud be removed.";
-        ok $entity->is_dirty, "The new entity should be stored";
+        ok ! $entity->is_dirty, "An empty entity shouldn't be stored";
         ok $entity->is_new, "The new data";
 
         (undef) = $entity->to_hash;
@@ -25,11 +25,11 @@ for (qw(SimpleEntity TestEntity CasualEntity)) {
 
     {
         my $entity = "t::$_"->new({});
-        ok $entity->is_dirty, "Save empty data";
+        ok ! $entity->is_dirty, "Don't save empty data";
         ok $entity->is_new, "The new data";
 
         $entity->revert;
-        ok $entity->is_dirty, "Is reverted but it has not been serialized.";
+        ok ! $entity->is_dirty, "Is reverted. Don't save empty data";
         ok $entity->is_new, "The new data";
 
         $entity->key1(18);
@@ -49,7 +49,7 @@ for (qw(SimpleEntity TestEntity CasualEntity)) {
         $entity->key1(99);  # Keep _origin field from being defined.
 
         $entity->revert;
-        ok $entity->is_dirty, "Is reverted but it has not been serialized.";
+        ok ! $entity->is_dirty, "Is reverted. Don't save empty data";
         ok $entity->is_new, "The new data";
     }
 

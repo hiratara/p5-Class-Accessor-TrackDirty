@@ -137,7 +137,7 @@ sub _mk_helpers($) {
                                                                  unless $field;
 
         return unless $tracked_fields->{$field};
-        return 1 unless defined $self->{$RESERVED_FIELD};
+        return defined $self->{$field} unless defined $self->{$RESERVED_FIELD};
 
         exists $self->{$field} &&
                _is_different $self->{$field}, $self->{$RESERVED_FIELD}{$field};
