@@ -1,6 +1,7 @@
 Revision history for Perl module Class::Accessor::TrackDirty
 
 {{$NEXT}}
+    - Fresh empty fields are considered as clean. This is API-breaking change
 
 0.06  2014-08-16 10:57:10 JST
     - Add the method to get names of modified fields (Advised by @bonnu)

@@ -19,7 +19,7 @@ use t::SimpleEntity;
     $entity->revert;
     is $entity->key1, undef;
     is $entity->key2, undef;
-    ok $entity->is_dirty;
+    ok ! $entity->is_dirty, 'No data to store';
 }
 
 {
