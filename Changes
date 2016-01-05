@@ -1,6 +1,8 @@
 Revision history for Perl module Class::Accessor::TrackDirty
 
 {{$NEXT}}
+
+0.10  2016-01-05 07:42:57 UTC
     - Fresh empty fields are considered as clean. This is API-breaking change
 
 0.06  2014-08-16 10:57:10 JST
