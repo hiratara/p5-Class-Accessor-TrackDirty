@@ -257,8 +257,8 @@ You can pass a hash-ref or hash-like list to C<<new>> method.
 
 =item C<< my $object = YourClass->new({name1 => "value1", ...}); >>
 
-The instance created by C<<new>> is regarded as `dirty' since it hasn't been
-stored yet.
+The instance created by C<<new>> is regarded as `dirty' if it has some nonempty
+fields. It's because it hasn't been stored yet.
 
 =back
 
