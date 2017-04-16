@@ -15,6 +15,8 @@ our $IS_MODIFIED = 'is_dirty';
 our $MODIFIED_FIELDS = 'dirty_fields';
 our $IS_NEW = 'is_new';
 our $REVERT = 'revert';
+our $MODIFIED_KEYS = 'dirty_keys';
+our $MODIFIED_HASH = 'dirty_data';
 
 {
     my %package_info;
@@ -156,6 +158,26 @@ sub _mk_helpers($) {
     *{"$package\::$REVERT"} = sub {
         my $self = shift;
         delete $self->{$_} for keys %$tracked_fields;
+    };
+
+    *{"$package\::$MODIFIED_KEYS"} = sub {
+        my $self = shift;
+        return map { exists $self->{$_} ? $_ : () } @$tracked_fields
+            unless defined $self->{$RESERVED_FIELD};
+
+        my @keys;
+        for (@$tracked_fields) {
+            push @keys, $_ if exists $self->{$_} &&
+                _is_different $self->{$_}, $self->{$RESERVED_FIELD}{$_};
+        }
+
+        return @keys;
+    };
+
+    *{"$package\::$MODIFIED_HASH"} = sub {
+        my $self = shift;
+        my %hash = map { ($_, $self->{$_}) } $self->$MODIFIED_KEYS;
+        \%hash;
     };
 }
 
