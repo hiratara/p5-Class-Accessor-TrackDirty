@@ -124,7 +124,7 @@ This method is a combination of `<mk_tracked_accessors`> and `<mk_new`>.
 
 # AUTHOR
 
-Masahiro Honma &lt;hiratara@cpan.org>
+Masahiro Honma <hiratara@cpan.org>
 
 # LICENSE AND COPYRIGHT
 
