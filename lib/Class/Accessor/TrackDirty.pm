@@ -270,6 +270,7 @@ Following helper methods will be created automatically.
 =over 4
 
 =item C<< $your_object->is_dirty; >>
+
 =item C<< $your_object->is_dirty("field_name"); >>
 
 Check that the instance is modified. If it's true, you should store this
