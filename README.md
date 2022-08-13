@@ -54,7 +54,7 @@ Create accessor methods and helper methods in your class.
 Following helper methods will be created automatically.
 
 - `$your_object->is_dirty;`
-=item `$your_object->is_dirty("field_name");`
+- `$your_object->is_dirty("field_name");`
 
     Check that the instance is modified. If it's true, you should store this
     instance into some place through using `<to_hash`> method.
@@ -120,7 +120,7 @@ This method is a combination of `<mk_tracked_accessors`> and `<mk_new`>.
 
 # SEE ALSO
 
-[Class::Accessor](https://metacpan.org/pod/Class::Accessor), [Class::Accessor::Lite](https://metacpan.org/pod/Class::Accessor::Lite), [MooseX::TrackDirty::Attributes](https://metacpan.org/pod/MooseX::TrackDirty::Attributes), [Hash::Dirty](https://metacpan.org/pod/Hash::Dirty)
+[Class::Accessor](https://metacpan.org/pod/Class%3A%3AAccessor), [Class::Accessor::Lite](https://metacpan.org/pod/Class%3A%3AAccessor%3A%3ALite), [MooseX::TrackDirty::Attributes](https://metacpan.org/pod/MooseX%3A%3ATrackDirty%3A%3AAttributes), [Hash::Dirty](https://metacpan.org/pod/Hash%3A%3ADirty)
 
 # AUTHOR
 
