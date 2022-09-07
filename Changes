@@ -1,6 +1,8 @@
 Revision history for Perl module Class::Accessor::TrackDirty
 
 {{$NEXT}}
+
+0.12  2022-09-07 13:40:40 JST
     - Fixed a bug where is_dirty would return true even if the hash-ref was not
       changed
 
