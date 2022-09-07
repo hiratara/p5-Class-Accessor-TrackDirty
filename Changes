@@ -1,6 +1,8 @@
 Revision history for Perl module Class::Accessor::TrackDirty
 
 {{$NEXT}}
+    - Fixed a bug where is_dirty would return true even if the hash-ref was not
+      changed
 
 0.110.1  2022-08-13 19:22:12 JST
     - Fix the version number string
