@@ -150,6 +150,28 @@ for (qw(SimpleEntity TestEntity CasualEntity)) {
         is $entity->key2, "hiratara";
         is $entity->mtime, "12345";
     }
+
+    {
+        # want to make all fields undefined
+        my $entity = "t::$_"->from_hash({
+            key1 => 45,
+            key2 => 'hiratara',
+            mtime => 1662538400,  # Wed Sep  7 08:13:20 2022 UTC
+        });
+        ok ! $entity->is_dirty, 'just retrive from KVS';
+        ok ! $entity->is_new, 'not a new entity';
+
+        $entity->mtime(undef);
+        ok ! $entity->is_dirty, q(don't care because mtime is not tracked);
+
+        $entity->key1(undef);
+        ok $entity->is_dirty, 'modified key1';
+
+        $entity->key2(undef);
+        ok $entity->is_dirty, 'modified all fields';
+
+        is_deeply $entity->to_hash, {};
+    }
 }
 
 done_testing;
