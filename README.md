@@ -60,7 +60,8 @@ Following helper methods will be created automatically.
     instance into some place through using `<to_hash`> method.
 
     When you pass the name of a field, you can know if the field contains the same
-    value as the stored object.
+    value as the stored object. Returns `undef` if the field is not tracked,
+    otherwise returns a defined boolean value.
 
 - `my @fields = $your_object->dirty_fields;`
 

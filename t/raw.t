@@ -5,6 +5,7 @@ use Test::More;
 use t::SimpleEntity;
 use t::TestEntity;
 use t::CasualEntity;
+use constant FALSE_VALUE => !!0;
 
 for (qw(SimpleEntity TestEntity CasualEntity)) {
     {
@@ -27,7 +28,7 @@ for (qw(SimpleEntity TestEntity CasualEntity)) {
         is_deeply $entity->raw, {
             key1 => 37, mtime => 1389955235,
         };
-        ok ! $entity->is_dirty, "Stored all data";
+        is $entity->is_dirty, FALSE_VALUE, "Stored all data";
 
         $entity->key1(36);
         $entity->mtime(1389955234);
@@ -43,12 +44,12 @@ for (qw(SimpleEntity TestEntity CasualEntity)) {
             not_managed_by_tdirty => 'HOGEHOGE',
         });
         is_deeply $entity->raw, {key1 => 36, mtime => 1389955234};
-        ok ! $entity->is_dirty, "Fresh instance";
+        is $entity->is_dirty, FALSE_VALUE, "Fresh instance";
 
         (undef) = $entity->to_hash; # Stored into some storages
 
         is_deeply $entity->raw, {key1 => 36, mtime => 1389955234};
-        ok ! $entity->is_dirty, "Fresh instance";
+        is $entity->is_dirty, FALSE_VALUE, "Fresh instance";
     }
 }
 

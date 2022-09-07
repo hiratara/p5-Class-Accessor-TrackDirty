@@ -3,6 +3,7 @@ use warnings;
 use lib '.';
 use Test::More;
 use t::SimpleEntity;
+use constant FALSE_VALUE => !!0;
 
 {
     my $entity = t::SimpleEntity->new(
@@ -29,7 +30,7 @@ use t::SimpleEntity;
         key2 => [qw(x y)],
     );
     is $entity->key2->[1], 'y';
-    ok ! $entity->is_dirty;
+    is $entity->is_dirty, FALSE_VALUE;
 
     $entity->key1->{nested}->{count}++;
     push @{$entity->key2}, 'z';
@@ -39,7 +40,7 @@ use t::SimpleEntity;
     $entity->revert;
     is $entity->key1->{nested}->{count}, 0;
     is_deeply $entity->key2, ['x', 'y'];
-    ok ! $entity->is_dirty;
+    is $entity->is_dirty, FALSE_VALUE;
 }
 
 {
@@ -57,7 +58,7 @@ use t::SimpleEntity;
     pop @{$entity->key2};
     is $entity->key1->{nested}->{count}, 0;
     is_deeply $entity->key2, ['x', 'y'];
-    ok ! $entity->is_dirty;
+    is $entity->is_dirty, FALSE_VALUE;
 }
 
 {
@@ -67,9 +68,9 @@ use t::SimpleEntity;
         key1 => \%value1,
         key2 => [],
     );
-    ok ! $entity->is_dirty;
+    is $entity->is_dirty, FALSE_VALUE;
     is_deeply $entity->key1, \%value1;
-    ok ! $entity->is_dirty, 'clean, even after accessing key1';
+    is $entity->is_dirty, FALSE_VALUE, 'clean, even after accessing key1';
 }
 
 done_testing;

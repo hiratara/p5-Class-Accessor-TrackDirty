@@ -278,7 +278,8 @@ Check that the instance is modified. If it's true, you should store this
 instance into some place through using C<<to_hash>> method.
 
 When you pass the name of a field, you can know if the field contains the same
-value as the stored object.
+value as the stored object. Returns C<undef> if the field is not tracked,
+otherwise returns a defined boolean value.
 
 =item C<< my @fields = $your_object->dirty_fields; >>
 
