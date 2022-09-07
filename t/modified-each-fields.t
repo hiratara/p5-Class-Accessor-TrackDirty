@@ -10,9 +10,9 @@ for (qw(SimpleEntity TestEntity CasualEntity)) {
     {
         my $entity = "t::$_"->new({key1 => "ABC", mtime => time});
         ok $entity->is_dirty('key1'), "The field hasn't been stored";
-        ok ! $entity->is_dirty('key2'), "An empty field is clean";
+        ok $entity->is_dirty('key2');
         ok ! $entity->is_dirty('mtime'), "Isn't managed by TrackDirty";
-        ok eq_set([$entity->dirty_fields], [qw(key1)]);
+        ok eq_set([$entity->dirty_fields], [qw(key1 key2)]);
     }
 
     {
