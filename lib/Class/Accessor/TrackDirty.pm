@@ -26,6 +26,7 @@ our $REVERT = 'revert';
 
 sub _is_different_deeply($$) {
     my ($ref_x, $ref_y) = @_;
+    local $Storable::canonical = 1;  # avoiding Hash Randomization
     (freeze $ref_x) ne (freeze $ref_y);
 }
 

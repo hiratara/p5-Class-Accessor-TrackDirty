@@ -60,4 +60,16 @@ use t::SimpleEntity;
     ok ! $entity->is_dirty;
 }
 
+{
+    # [the reproducible test case] broken by Hash Randomization
+    my %value1 = map { $_ => 1 } 1 .. 100;
+    my $entity = t::SimpleEntity->from_hash(
+        key1 => \%value1,
+        key2 => [],
+    );
+    ok ! $entity->is_dirty;
+    is_deeply $entity->key1, \%value1;
+    ok ! $entity->is_dirty, 'clean, even after accessing key1';
+}
+
 done_testing;
