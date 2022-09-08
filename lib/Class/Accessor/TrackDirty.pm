@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use List::MoreUtils qw(any);
 use Storable qw(dclone freeze);
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 our $RESERVED_FIELD = '_original';
 our $NEW = 'new';

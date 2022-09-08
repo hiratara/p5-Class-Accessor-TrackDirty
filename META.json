@@ -64,7 +64,7 @@
          "web" : "https://github.com/hiratara/p5-Class-Accessor-TrackDirty"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_contributors" : [
       "Masahiro Honma <hira.tara@gmail.com>",
       "Masahiro Honma <tarara@hirataraDebian.hiratara.local>",

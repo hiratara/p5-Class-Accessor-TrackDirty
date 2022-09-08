@@ -1,6 +1,8 @@
 Revision history for Perl module Class::Accessor::TrackDirty
 
 {{$NEXT}}
+
+0.13  2022-09-08 11:53:37 JST
     - A new empty instance is no longer considered clean
 
 0.12  2022-09-07 13:40:40 JST
