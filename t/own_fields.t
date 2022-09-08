@@ -36,7 +36,7 @@ my $now = time;
     is $hash_ref->{mtime}, $now;
     ok ! exists $hash_ref->{dummy}, "Don't store undefined fields.";
 
-    ok ! $entity->is_dirty, "Cleaned";
+    is $entity->is_dirty, !!0, "Cleaned";
     is $entity->mtime, $now, "Don't break normal fields.";
     is $entity->dummy, 30, "Don't touch to my private field.";
 }

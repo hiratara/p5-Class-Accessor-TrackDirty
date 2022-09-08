@@ -138,7 +138,7 @@ sub _mk_helpers($) {
                                                                  unless $field;
 
         return unless $tracked_fields->{$field};
-        return defined $self->{$field} unless defined $self->{$RESERVED_FIELD};
+        return 1 unless defined $self->{$RESERVED_FIELD};
 
         exists $self->{$field} &&
                _is_different $self->{$field}, $self->{$RESERVED_FIELD}{$field};
@@ -258,8 +258,8 @@ You can pass a hash-ref or hash-like list to C<<new>> method.
 
 =item C<< my $object = YourClass->new({name1 => "value1", ...}); >>
 
-The instance created by C<<new>> is regarded as `dirty' if it has some nonempty
-fields. It's because it hasn't been stored yet.
+The instance created by C<<new>> is regarded as `dirty' since it hasn't been
+stored yet.
 
 =back
 
@@ -278,7 +278,8 @@ Check that the instance is modified. If it's true, you should store this
 instance into some place through using C<<to_hash>> method.
 
 When you pass the name of a field, you can know if the field contains the same
-value as the stored object.
+value as the stored object. Returns C<undef> if the field is not tracked,
+otherwise returns a defined boolean value.
 
 =item C<< my @fields = $your_object->dirty_fields; >>
 
